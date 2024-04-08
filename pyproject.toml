@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "reflex-test"
+version = "0.1.0"
+description = ""
+authors = ["Tim Child <timjchild@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+reflex = "^0.4.5"
+google-auth = {extras = ["requests"], version = "^2.29.0"}
+python-dotenv = "^1.0.1"
+reflex-webcam = "^0.0.5"
+pillow = "^10.3.0"
+reflex-carousel = "^0.0.1"
+
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.3.5"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.ruff]
