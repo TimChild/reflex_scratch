@@ -5,6 +5,15 @@ import reflex as rx
 from reflex_test.templates import template
 
 
+class DifferentState(rx.State):
+    color: str = "red"
+    _clicks: int = 0
+
+    def change_color(self):
+        self._clicks += 5
+        self.color = ["red", "green", "blue", "yellow", "purple", "orange"][self._clicks % 6]
+
+
 class ScratchState(rx.State):
     color: str = "red"
     _clicks: int = 0
@@ -12,9 +21,17 @@ class ScratchState(rx.State):
     def change_color(self):
         self._clicks += 1
         self.color = ["red", "green", "blue", "yellow", "purple", "orange"][self._clicks % 6]
+        yield DifferentState.change_color
+
+    def sync_color_change_method(self):
+        self._clicks += 1
+        self.color = ["red", "green", "blue", "yellow", "purple", "orange"][self._clicks % 6]
+        # Does not work to yield another state change
+        # yield DifferentState.change_color
 
     def change_color_by_method(self):
-        self.change_color()
+        self.sync_color_change_method()
+
 
     @rx.background
     async def async_change_color(self):
@@ -23,20 +40,36 @@ class ScratchState(rx.State):
             self._clicks += 1
             self.color = ["red", "green", "blue", "yellow", "purple", "orange"][self._clicks % 6]
         await asyncio.sleep(0.5)
+        yield DifferentState.change_color
+        await asyncio.sleep(0.5)
         async with self:
             self._clicks += 1
             self.color = ["red", "green", "blue", "yellow", "purple", "orange"][self._clicks % 6]
+        await asyncio.sleep(0.5)
+        yield DifferentState.change_color
 
-    async def color_change_method(self):
+    async def async_color_change_method_with_self(self):
         async with self:
             self._clicks += 1
             self.color = ["red", "green", "blue", "yellow", "purple", "orange"][self._clicks % 6]
+        await asyncio.sleep(0.5)
+        yield DifferentState.change_color
+
+    async def async_color_change_method_without_self(self):
+        self._clicks += 1
+        self.color = ["red", "green", "blue", "yellow", "purple", "orange"][self._clicks % 6]
+        yield
+        await asyncio.sleep(0.5)
+        yield DifferentState.change_color
 
     @rx.background
     async def async_change_color_by_method(self):
-        await self.color_change_method()
+        async for v in self.async_color_change_method_with_self():
+            yield v
         await asyncio.sleep(0.5)
-        await self.color_change_method()
+        async with self:
+            async for v in self.async_color_change_method_without_self():
+                yield v
 
 @template(route="/scratch", title="Scratch")
 def index() -> rx.Component:
@@ -64,6 +97,7 @@ def index() -> rx.Component:
                 rx.button("Change color", on_click=ScratchState.async_change_color_by_method),
                 background_color=rx.color(ScratchState.color, alpha=True)
             ),
+            rx.box(width="50em", height="10em", background_color=rx.color(DifferentState.color, alpha=False)),
             width="100%",
         ),
 
