@@ -125,3 +125,4 @@ venv.bak/
 venv/
 wheels/
 uploaded_files/audio.webm
+*.webm

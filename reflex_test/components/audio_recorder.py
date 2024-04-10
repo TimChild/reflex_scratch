@@ -1,26 +1,19 @@
 from textwrap import dedent
 from typing import Dict, Any
 import reflex as rx
+from reflex.utils.format import format_event_chain, for
 from reflex.vars import Var
-
-
-class _AudioSaveEvent(rx.Base):
-    event: Any
-    blob: Any
 
 
 def _on_recording_complete_signature(blob: Any) -> list[Any]:
     return [
-        # e0.event,
-        rx.Var.create_safe(f"extract_audio({blob})"),
+        rx.Var.create_safe(f"audio_blob_to_url({blob})"),
+        # rx.Var.create_safe(f"extract_audio({blob})")
     ]
 
 
-# rx.Var.create_safe(f"serializeBlob({blob}).then(serializedString => {{return serializedString}}).catch(error => {{console.error('Error serializing blob:', error);}})"),
-
-
 clientside_audio_url_script = dedent("""\
-            const extract_audio = (blob) => {
+            const audio_blob_to_url = (blob) => {
             if (!(blob instanceof Blob)) {
                 console.error('Invalid argument type:', typeof blob);
                 throw new TypeError('Argument must be a Blob');
@@ -30,8 +23,47 @@ clientside_audio_url_script = dedent("""\
             const url = URL.createObjectURL(blob);
             return url;
             };
+            
+            function download_blob(url) {
+                console.log(url);
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', url, true);
+                xhr.responseType = 'blob';
+                return new Promise((resolve, reject) => {
+                    xhr.onload = function(e) {
+                        if (this.status == 200) {
+                            var blob = this.response;
+                            // console.log(blob);
+                            // blob is now the blob that the object URL pointed to.
+                            var reader = new window.FileReader();
+                            reader.readAsDataURL(blob); 
+                            reader.onloadend = function() {
+                                var base64 = reader.result;
+                                // base64 = base64.split(',')[1];
+                                // console.log(base64);
+                                resolve(base64);
+                            }
+                        }
+                    };
+                    xhr.send();
+                });
+              };
             """)
 
+
+# """
+#             function extract_audio(blob) {
+#                 console.log(blob);
+#                 return new Promise((resolve, reject) => {
+#                     var reader = new window.FileReader();
+#                     reader.readAsDataURL(blob);
+#                     reader.onloadend = function() {
+#                         var base64 = reader.result;
+#                         resolve(base64);
+#                     }
+#                 });
+#             };
+# """
 
 class AudioRecorder(rx.Component):
     """Wrapper for react-audio-voice-recorder component."""
@@ -46,11 +78,6 @@ class AudioRecorder(rx.Component):
     # This is normally used when components don't have curly braces around them when importing.
     is_default = False
 
-    # The props of the React component.
-    # Note: when Reflex compiles the component to Javascript,
-    # `snake_case` property names are automatically formatted as `camelCase`.
-    # The prop names may be defined in `camelCase` as well.
-
     # Show waveform while recording
     show_visualizer: Var[bool] = True
 
@@ -62,6 +89,9 @@ class AudioRecorder(rx.Component):
             **super().get_event_triggers(),
             "on_recording_complete": _on_recording_complete_signature,
         }
+
+    def _get_hooks(self) -> str | None:
+        pass
 
     def _get_custom_code(self) -> str:
         return clientside_audio_url_script
