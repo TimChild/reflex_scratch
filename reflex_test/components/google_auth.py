@@ -29,7 +29,7 @@ class AuthState(rx.State):
                 json.loads(self.id_token_json)["credential"],
                 requests.Request(),
                 CLIENT_ID,
-                clock_skew_in_seconds=0.1
+                clock_skew_in_seconds=5
             )
         except Exception as exc:
             if self.id_token_json:
