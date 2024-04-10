@@ -71,6 +71,11 @@ class ScratchState(rx.State):
             async for v in self.async_color_change_method_without_self():
                 yield v
 
+    async def directly_change_other_state(self):
+        different_state = await self.get_state(DifferentState)
+        different_state.color = "white"
+
+
 @template(route="/scratch", title="Scratch")
 def index() -> rx.Component:
     return rx.container(
@@ -96,6 +101,10 @@ def index() -> rx.Component:
                 rx.heading("Update state async background task method call"),
                 rx.button("Change color", on_click=ScratchState.async_change_color_by_method),
                 background_color=rx.color(ScratchState.color, alpha=True)
+            ),
+            rx.card(
+                rx.heading("Update other state directly"),
+                rx.button("Change color", on_click=ScratchState.directly_change_other_state),
             ),
             rx.box(width="50em", height="10em", background_color=rx.color(DifferentState.color, alpha=False)),
             width="100%",
