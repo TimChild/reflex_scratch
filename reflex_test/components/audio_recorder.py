@@ -32,21 +32,6 @@ clientside_audio_url_script = dedent("""\
             };
             """)
 
-# serialize_blob_promise = dedent("""\
-#     function serializeBlob(blob) {
-#       return new Promise((resolve, reject) => {
-#         const reader = new FileReader();
-#         reader.onload = function() {
-#           // The result attribute contains the data as a base64 encoded string
-#           resolve(reader.result);
-#         };
-#         reader.onerror = function(error) {
-#           reject(error);
-#         };
-#         reader.readAsDataURL(blob);
-#       });
-#     }
-#     """)
 
 class AudioRecorder(rx.Component):
     """Wrapper for react-audio-voice-recorder component."""
