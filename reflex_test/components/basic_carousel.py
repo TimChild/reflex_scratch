@@ -1,4 +1,5 @@
 """Reflex custom component Carousel."""
+
 import reflex as rx
 
 from reflex.utils import imports
@@ -21,15 +22,14 @@ class Carousel(rx.Component):
 
     # The React component tag.
     tag = "Carousel"
-    
+
     auto_play: rx.Var[bool] = True
     interval: rx.Var[int] = 3000
     infinite_loop: rx.Var[bool] = True
     center_mode: rx.Var[bool] = True
     center_slide_percentage: rx.Var[int] = 80
-    
+
     emulate_touch: rx.Var[bool] = True
-    
 
     def _get_imports(self) -> imports.ImportDict:
         return imports.merge_imports(

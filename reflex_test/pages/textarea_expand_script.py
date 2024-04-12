@@ -3,6 +3,7 @@
 
 Helpful to see how javascript can be added to the page.
 """
+
 import reflex as rx
 
 
@@ -15,9 +16,10 @@ def index() -> rx.Component:
     )
 
 
-app = rx.App(head_components=[
-    ## https://stackoverflow.com/a/25621277
-    rx.script("""
+app = rx.App(
+    head_components=[
+        ## https://stackoverflow.com/a/25621277
+        rx.script("""
         const tx = document.getElementsByTagName("textarea");
         for (let i = 0; i < tx.length; i++) {
         tx[i].setAttribute("style", "height:" + (tx[i].scrollHeight) + "px;overflow-y:hidden;");

@@ -42,7 +42,7 @@ def last_screenshot_widget() -> rx.Component:
             ),
             rx.center(
                 rx.text("Click image to capture.", size="4"),
-                ),
+            ),
         ),
         height="270px",
     )
@@ -77,4 +77,3 @@ def index() -> rx.Component:
             padding_top="3em",
         ),
     )
-

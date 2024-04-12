@@ -1,4 +1,5 @@
 """Reflex custom component Carousel."""
+
 import reflex as rx
 
 from reflex.utils import imports
@@ -23,7 +24,7 @@ class Carousel(rx.Component):
     # The React component tag.
     tag = "Slider"
     is_default = True
-    
+
     autoplay: rx.Var[bool] = True
     autoplay_speed: rx.Var[int] = 3000
     pause_on_hover: rx.Var[bool] = True

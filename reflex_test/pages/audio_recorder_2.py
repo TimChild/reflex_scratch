@@ -31,22 +31,22 @@ audio_recorder = AudioRecorder.create
 
 
 def _on_recording_complete_signature(blob: Any):
-    return [
-        rx.Var.create_safe(f"extract_audio({blob})")
-    ]
+    return [rx.Var.create_safe(f"extract_audio({blob})")]
 
 
 class AudioState(rx.State):
-
     def recording_complete_callback(self, b64_str):
-        decodedData = base64.b64decode(b64_str.split(',')[1])
-        webmfile = (rx.get_upload_dir() / "audio.webm")
-        with open(webmfile, 'wb') as file:
+        decodedData = base64.b64decode(b64_str.split(",")[1])
+        webmfile = rx.get_upload_dir() / "audio.webm"
+        with open(webmfile, "wb") as file:
             file.write(decodedData)
 
     def update_recorded_audio(self, url: any):
         return [
-            rx.call_script(f"""download_blob("{url}")""", callback=AudioState.recording_complete_callback)
+            rx.call_script(
+                f"""download_blob("{url}")""",
+                callback=AudioState.recording_complete_callback,
+            )
         ]
 
 
@@ -78,7 +78,6 @@ def index() -> rx.Component:
                     });
                   };
                 """),
-
         rx.script("""function extract_audio(blob) {
                 if (!(blob instanceof Blob)) {
                     console.error('Invalid argument type:', typeof blob);

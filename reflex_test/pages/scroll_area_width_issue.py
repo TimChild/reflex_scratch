@@ -3,18 +3,20 @@ from reflex.constants.colors import ColorType
 
 from reflex_test.templates import template
 
-COLORS = ["pink",
-          "plum",
-          "purple",
-          "violet",
-          "iris",
-          "indigo",
-          "blue",
-          "cyan",
-          "teal",
-          "jade",
-          "green",
-          "grass", ]
+COLORS = [
+    "pink",
+    "plum",
+    "purple",
+    "violet",
+    "iris",
+    "indigo",
+    "blue",
+    "cyan",
+    "teal",
+    "jade",
+    "green",
+    "grass",
+]
 
 
 def render_box(color: ColorType, index: int) -> rx.Component:
@@ -40,7 +42,7 @@ def scroll_area_part() -> rx.Component:
             ),
             type="hover",
             width="100%",
-            height='300px',
+            height="300px",
             scrollbars="vertical",
             overflow_x="hidden",
         ),
@@ -54,12 +56,14 @@ def index() -> rx.Component:
     return rx.box(
         rx.fragment(
             rx.vstack(
-                rx.heading("Problem where the rx.scroll_area width is not constrained to the parent box width."),
+                rx.heading(
+                    "Problem where the rx.scroll_area width is not constrained to the parent box width."
+                ),
                 scroll_area_part(),
                 height="100%",
-            )),
-
-        name='box-area',
+            )
+        ),
+        name="box-area",
         width="100%",
         align="center",
         border="1px solid green",

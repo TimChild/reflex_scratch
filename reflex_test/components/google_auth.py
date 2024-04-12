@@ -12,9 +12,13 @@ from .react_oauth_google import GoogleOAuthProvider, GoogleLogin
 
 from dotenv import load_dotenv  # noqa: F401
 
-CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "587721936400-dc0in5bvrkadoas6d9ottl1e8vf3qlsm.apps.googleusercontent.com") 
-print(f'Found client id={CLIENT_ID}')
+CLIENT_ID = os.environ.get(
+    "GOOGLE_CLIENT_ID",
+    "587721936400-dc0in5bvrkadoas6d9ottl1e8vf3qlsm.apps.googleusercontent.com",
+)
+print(f"Found client id={CLIENT_ID}")
 # CLIENT_ID = ''
+
 
 class AuthState(rx.State):
     id_token_json: str = rx.LocalStorage()
@@ -29,7 +33,7 @@ class AuthState(rx.State):
                 json.loads(self.id_token_json)["credential"],
                 requests.Request(),
                 CLIENT_ID,
-                clock_skew_in_seconds=5
+                clock_skew_in_seconds=5,
             )
         except Exception as exc:
             if self.id_token_json:
@@ -43,8 +47,7 @@ class AuthState(rx.State):
     def token_is_valid(self) -> bool:
         try:
             return bool(
-                self.tokeninfo
-                and int(self.tokeninfo.get("exp", 0)) > time.time()
+                self.tokeninfo and int(self.tokeninfo.get("exp", 0)) > time.time()
             )
         except Exception:
             return False
@@ -90,6 +93,7 @@ def require_google_login(page) -> rx.Component:
             ),
             client_id=CLIENT_ID,
         )
+
     return _auth_wrapper
 
 
@@ -108,4 +112,3 @@ def index():
 #         rx.chakra.text(AuthState.protected_content),
 #         rx.chakra.link("Home", href="/"),
 #     )
-

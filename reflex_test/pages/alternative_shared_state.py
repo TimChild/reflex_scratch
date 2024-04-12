@@ -6,6 +6,7 @@ https://github.com/reflex-dev/reflex/issues/1857
 Specifically the `async with app.modify_state(token)` part.
 Maybe even possible to set the whole state with `app.state_manager.set_state(...)`?
 """
+
 import reflex as rx
 
 from ..reflex_test import app
@@ -65,7 +66,9 @@ class State(rx.State):
             self.clientToken = self.get_token()
 
         # Mark this state's token as belonging to the clientToken
-        shared_sessions_by_token.setdefault(self.clientToken, set()).add(self.get_token())
+        shared_sessions_by_token.setdefault(self.clientToken, set()).add(
+            self.get_token()
+        )
 
         # Mark this state's websocket id as belonging to the clientToken and state token
         tokens_by_sid[self.get_sid()] = (self.clientToken, self.get_token())
@@ -74,7 +77,7 @@ class State(rx.State):
         return State.set_color_state_for_new_session
 
 
-@template("/alternative_shared_state_1", title='Alternative Shared State 1')
+@template("/alternative_shared_state_1", title="Alternative Shared State 1")
 def page1() -> rx.Component:
     return rx.vstack(
         rx.button(
@@ -86,11 +89,11 @@ def page1() -> rx.Component:
                 State.colorState,
             ),
             background_color=State.colorState,
-        )
+        ),
     )
 
 
-@template("/alternative_shared_state_2", title='Alternative Shared State 2')
+@template("/alternative_shared_state_2", title="Alternative Shared State 2")
 def page2() -> rx.Component:
     return rx.vstack(
         rx.button(
@@ -102,22 +105,24 @@ def page2() -> rx.Component:
                 State.colorState,
             ),
             background_color=State.colorState,
-        )
+        ),
     )
-
-
 
 
 # Handle websocket disconnect events to avoid memory leaks when sessions are closed
 orig_disconnect = app.event_namespace.on_disconnect
 
+
 def disconnect_handler(sid):
     orig_disconnect(sid)
 
     clientToken, token = tokens_by_sid.get(sid, (None, None))
-    print(f"Disconnect event received for {sid}. Removing {token} from shared {clientToken}")
+    print(
+        f"Disconnect event received for {sid}. Removing {token} from shared {clientToken}"
+    )
 
     shared_sessions_by_token.get(clientToken, set()).discard(token)
     tokens_by_sid.pop(sid, None)
+
 
 app.event_namespace.on_disconnect = disconnect_handler
