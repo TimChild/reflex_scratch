@@ -6,7 +6,6 @@ import reflex as rx
 from reflex_test.templates import template
 
 from ..components import multiselect
-from ..components.multi_select import MultiSelectState
 
 
 class DifferentState(rx.State):
@@ -115,6 +114,34 @@ class CacheTestState(rx.State):
 #         print(self.selected)
 #         return ', '.join([d['value'] for d in self.selected])
 
+class MultiSelectState(rx.State):
+    selected: List[dict[str, str]] = []
+
+    @rx.cached_var
+    def selected_values(self) -> str:
+        return ", ".join([d["value"] for d in self.selected])
+
+# @rx.page(route="/multi_select", title="Multi Select")
+# def index() -> rx.Component:
+#     return rx.container(
+#         multiselect(
+#             options=[
+#                 {"value": "opt1", "label": "Option 1"},
+#                 {"value": "opt2", "label": "Option 2"},
+#             ],
+#             on_change=MultiSelectState.set_selected,
+#         ),
+#         rx.text(f"Multiselect value {MultiSelectState.selected_values}"),
+#     )
+
+
+multi_inst = multiselect(
+    options=[
+        {"value": "opt1", "label": "Option 1"},
+        {"value": "opt2", "label": "Option 2"},
+    ],
+    on_change=MultiSelectState.set_selected,
+)
 
 @template(route="/scratch", title="Scratch")
 def index() -> rx.Component:
@@ -122,15 +149,16 @@ def index() -> rx.Component:
         rx.vstack(
             rx.heading("Scratch page:"),
             rx.divider(),
-            multiselect(
-                options=[
-                    {"value": "opt1", "label": "Option 1"},
-                    {"value": "opt2", "label": "Option 2"},
-                ],
-                value=MultiSelectState.selected,
-                on_change=MultiSelectState.handle_change,
-            ),
+            # multiselect(
+            #     options=[
+            #         {"value": "opt1", "label": "Option 1"},
+            #         {"value": "opt2", "label": "Option 2"},
+            #     ],
+            #     value=MultiSelectState.selected,
+            # ),
+            multi_inst,
             rx.text(f"Multiselect value {MultiSelectState.selected_values}"),
+            # rx.text(f"Multiselect value {multi_inst.selected_values}"),
             rx.divider(),
             rx.card(
                 rx.heading("Cache test"),

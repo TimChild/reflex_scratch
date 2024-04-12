@@ -1,10 +1,9 @@
-import reflex as rx
 from typing import Any
 
-from reflex.components.component import Component
+import reflex as rx
 
 
-class MultiSelectComponent(Component):
+class MultiSelectComponent(rx.Component):
     library = "react-select"
     tag = "Select"
     is_default = True
@@ -20,21 +19,30 @@ class MultiSelectComponent(Component):
         }
 
 
-multiselect = MultiSelectComponent.create
+class MultiSelectComponentState(rx.ComponentState):
+    component_state_value: list[dict[str, str]] = []
 
+    @classmethod
+    def get_component(cls, *children, **props) -> rx.Component:
+            on_change = props.pop("on_change", [])
+            if not isinstance(on_change, list):
+                on_change = [on_change]
 
-class MultiSelectState(rx.State):
-    selected: list[dict[str, str]] = []
+            value = props.get('value', None)
+            if value is None:
+                value = cls.component_state_value
+                on_change = [cls.set_component_state_value, *on_change]
+            else:
+                if not on_change:
+                    raise ValueError("MultiSelectComponent requires an on_change event handler if value is set.")
 
-    def handle_change(self, change: list[dict[str, str]]):
-        print(f"Change: {change}")
-        self.selected = change
-
-    @rx.cached_var
-    def selected_values(self) -> str:
-        print(self.selected)
-        return ", ".join([d["value"] for d in self.selected])
-
+            return MultiSelectComponent.create(
+                *children,
+                value=value,
+                on_change=on_change,
+                **props,
+        )
+multiselect = MultiSelectComponentState.create
 
 # @rx.page(route="/multi_select", title="Multi Select")
 # def index() -> rx.Component:
