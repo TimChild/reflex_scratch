@@ -9,6 +9,7 @@ from .scroll_area_width_issue import index as scroll_area_width_issue
 from .component_with_state import index as component_with_state
 from .scratch import index as scratch
 from ..reflex_issues.textarea_set_value_thought import index as textarea_set_value_thought
+from .stripe_payment_element import index as stripe_payment_element
 
 __all__ = [
     "settings",
@@ -22,4 +23,5 @@ __all__ = [
     "scratch",
     "audio_recorder_2",
     "textarea_set_value_thought",
+    "stripe_payment_element",
 ]

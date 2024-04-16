@@ -13,6 +13,7 @@ python-dotenv = "^1.0.1"
 reflex-webcam = "^0.0.5"
 pillow = "^10.3.0"
 reflex-carousel = "^0.0.1"
+stripe = "^9.1.0"
 
 
 [tool.poetry.group.dev.dependencies]
