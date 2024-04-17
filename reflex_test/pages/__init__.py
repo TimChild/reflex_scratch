@@ -11,6 +11,7 @@ from .scratch import index as scratch
 from ..reflex_issues.textarea_set_value_thought import index as textarea_set_value_thought
 from .stripe_payment_element import index as stripe_payment_element
 from .scroll_snap_testing import index as scroll_snap_testing
+from .styling_test import index as styling_test
 
 __all__ = [
     "settings",
@@ -26,4 +27,5 @@ __all__ = [
     "textarea_set_value_thought",
     "stripe_payment_element",
     "scroll_snap_testing",
+    "styling_test",
 ]
