@@ -102,63 +102,11 @@ class CacheTestState(rx.State):
     #     return "cached async str"
 
 
-# class MultiSelectState(rx.State):
-#     selected: List[dict[str, str]] = []
-#
-#     def handle_change(self, change: list[dict[str, str]]):
-#         print(f"Change: {change}")
-#         self.selected = change
-#
-#     @rx.cached_var
-#     def selected_values(self) -> str:
-#         print(self.selected)
-#         return ', '.join([d['value'] for d in self.selected])
-
-class MultiSelectState(rx.State):
-    selected: List[dict[str, str]] = []
-
-    @rx.cached_var
-    def selected_values(self) -> str:
-        return ", ".join([d["value"] for d in self.selected])
-
-# @rx.page(route="/multi_select", title="Multi Select")
-# def index() -> rx.Component:
-#     return rx.container(
-#         multiselect(
-#             options=[
-#                 {"value": "opt1", "label": "Option 1"},
-#                 {"value": "opt2", "label": "Option 2"},
-#             ],
-#             on_change=MultiSelectState.set_selected,
-#         ),
-#         rx.text(f"Multiselect value {MultiSelectState.selected_values}"),
-#     )
-
-
-multi_inst = multiselect(
-    options=[
-        {"value": "opt1", "label": "Option 1"},
-        {"value": "opt2", "label": "Option 2"},
-    ],
-    on_change=MultiSelectState.set_selected,
-)
-
-@template(route="/scratch", title="Scratch")
+@template(route="/async_background_testing", title="Async background testing")
 def index() -> rx.Component:
     return rx.container(
         rx.vstack(
             rx.heading("Scratch page:"),
-            rx.divider(),
-            # multiselect(
-            #     options=[
-            #         {"value": "opt1", "label": "Option 1"},
-            #         {"value": "opt2", "label": "Option 2"},
-            #     ],
-            #     value=MultiSelectState.selected,
-            # ),
-            multi_inst,
-            rx.text(f"Multiselect value {MultiSelectState.selected_values}"),
-            # rx.text(f"Multiselect value {multi_inst.selected_values}"),
             rx.divider(),
             rx.card(
                 rx.heading("Cache test"),
