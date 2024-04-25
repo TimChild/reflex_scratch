@@ -1318,13 +1318,13 @@ ocsp = ["cryptography (>=36.0.1)", "pyopenssl (==20.0.1)", "requests (>=2.26.0)"
 
 [[package]]
 name = "reflex"
-version = "0.4.8"
+version = "0.4.9"
 description = "Web apps in pure Python."
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "reflex-0.4.8-py3-none-any.whl", hash = "sha256:99f6ac8cc4d1519a8fbfd1bb9ada4957b83955ed9b44c6ab7e794b75c29ef61d"},
-    {file = "reflex-0.4.8.tar.gz", hash = "sha256:77a901e5ed1d78fd37f48f42255b26d13eb6575ccf08ea168e3665e12cc7cdcf"},
+    {file = "reflex-0.4.9-py3-none-any.whl", hash = "sha256:7210a1af9e50db97866619f8c9a18f9cde25c08890f96a7d33e00a9a8bfc6074"},
+    {file = "reflex-0.4.9.tar.gz", hash = "sha256:d549f29a2e14e23dd28ecfb04fb95f0f032fcab6b9176c84b836b6b74c5c6c97"},
 ]
 
 [package.dependencies]
@@ -2243,4 +2243,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "9951979bbfabe5e30eb2b7c60c14cd865da3b8e322b7647e4048402f4d8b6e3e"
+content-hash = "42ec7038ad36c8aab899bfbb59b48b86dc6905d4495300d29f0e827e761d71d4"
