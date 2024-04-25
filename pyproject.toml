@@ -7,13 +7,14 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-reflex = "^0.4.5"
+reflex = "^0.4.8"
 google-auth = {extras = ["requests"], version = "^2.29.0"}
 python-dotenv = "^1.0.1"
 reflex-webcam = "^0.0.5"
 pillow = "^10.3.0"
 reflex-carousel = "^0.0.1"
 stripe = "^9.1.0"
+reflex-audio-capture = "^0.0.2"
 
 
 [tool.poetry.group.dev.dependencies]

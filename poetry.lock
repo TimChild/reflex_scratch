@@ -1363,6 +1363,23 @@ wheel = ">=0.42.0,<1.0"
 wrapt = {version = ">=1.14.0,<2.0", markers = "python_version >= \"3.11\""}
 
 [[package]]
+name = "reflex-audio-capture"
+version = "0.0.2"
+description = "Experimental audio-recorder-polyfill component"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "reflex_audio_capture-0.0.2-py3-none-any.whl", hash = "sha256:7aafa6cabe527522db7d18ec38dc0ca7d4592337f59c74be6a9e1a7d20f1b647"},
+    {file = "reflex_audio_capture-0.0.2.tar.gz", hash = "sha256:9d8e1c2f64f0a3f00746526bc00d8fe5af8eb92f320d9a0f1f633bbd615773ce"},
+]
+
+[package.dependencies]
+reflex = ">=0.4.8"
+
+[package.extras]
+dev = ["build", "twine"]
+
+[[package]]
 name = "reflex-carousel"
 version = "0.0.1"
 description = "Reflex custom component carousel"
@@ -2226,4 +2243,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "1bf6133eb3b30f820433a2308f47ec17e4dfb6bfab018bad41007d423ef40e9a"
+content-hash = "9951979bbfabe5e30eb2b7c60c14cd865da3b8e322b7647e4048402f4d8b6e3e"
