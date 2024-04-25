@@ -10,6 +10,8 @@ then after opening a new tab, they started working again (or after changing name
 
 Then also have to be more careful about setting values on external
 states (i.e. can't just update a sub value of an external state)
+
+Main problem is that I forgot to use value=... instead I was putting the value in the children part
 """
 
 import uuid
@@ -33,7 +35,12 @@ class TextAreaState(rx.State):
         self.text_area_value = uuid.uuid4().hex
         self.bar.text_value = uuid.uuid4().hex
         self.qux = Bar(text_value=uuid.uuid4().hex)
-        self.foo.text_value = uuid.uuid4().hex
+        # self.foo.text_value = uuid.uuid4().hex
+
+        # setattr(self, "text_area_value", uuid.uuid4().hex)
+        # setattr(self.bar, "text_value", uuid.uuid4().hex)
+        # setattr(self, "qux", Bar(text_value=uuid.uuid4().hex))
+        setattr(self.foo, "text_value", uuid.uuid4().hex)
 
 
 class OtherTextAreaState(rx.State):
