@@ -22,6 +22,7 @@ class DifferentState(rx.State):
 class ScratchState(rx.State):
     color: str = "red"
     _clicks: int = 0
+    number: int = 0
 
     def change_color(self):
         self._clicks += 1
@@ -91,6 +92,27 @@ class ScratchState(rx.State):
         different_state = await self.get_state(DifferentState)
         different_state.color = "white"
 
+    @rx.background
+    async def increment_number(self):
+        async with self:
+            self.number = 10
+        await asyncio.sleep(0.3)
+        async with self:
+            self.number = 20
+
+    @rx.background
+    async def start_several_tasks_via_yields(self):
+        async with self:
+            self.number = 0
+        await asyncio.sleep(1)
+        yield ScratchState.increment_number
+        await asyncio.sleep(1)
+        async with self:
+            self.number = 1
+
+
+
+
 
 class CacheTestState(rx.State):
     @rx.cached_var
@@ -147,6 +169,7 @@ def index() -> rx.Component:
                 height="10em",
                 background_color=rx.color(DifferentState.color, alpha=False),
             ),
+            rx.button(rx.text(ScratchState.number.to(str)), on_click=ScratchState.start_several_tasks_via_yields),
             width="100%",
         ),
     )
