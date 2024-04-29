@@ -60,6 +60,7 @@
 *.sage.py
 *.so
 *.spec
+*.webm
 .Python
 .cache
 .coverage
@@ -120,9 +121,8 @@ profile_default/
 sdist/
 share/python-wheels/
 target/
+uploaded_files/audio.webm
 var/
 venv.bak/
 venv/
 wheels/
-uploaded_files/audio.webm
-*.webm
