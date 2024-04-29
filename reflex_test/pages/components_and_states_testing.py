@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import random
+from contextlib import asynccontextmanager
 from typing import cast
 
 import reflex as rx
@@ -14,7 +15,23 @@ logger.setLevel(logging.INFO)
 
 choices = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
 
-class PageState(rx.State):
+
+class OptionalSelfMixin:
+    """
+    2024-04-29 This works, but the behaviour when calling method from another state is different to that when called
+    from a background state. Many tasks overwrite each other without the async with self block.
+    """
+    @asynccontextmanager
+    async def opt_self(self: rx.State, with_self: bool):
+        if with_self:
+            async with self:
+                yield
+        else:
+            yield
+
+
+class PageState(OptionalSelfMixin, rx.State):
+
     value: str = 'a'
     second_value: str = ''
 
@@ -23,18 +40,25 @@ class PageState(rx.State):
         self.value = value
         self.second_value = second_value
 
-    @rx.background
-    async def do_something(self):
-        async with self:
+
+    async def do_something_method(self, with_self=False):
+        async with self.opt_self(with_self):
             s: str = (self.second_value*2)[:15]
             s = ''.join(reversed(s))
             self.second_value = s
+        yield
 
         for i in range(10):
-            async with self:
+            async with self.opt_self(with_self):
                 self.value = f'{self.value}, {random.choice(choices)}'
+            yield
             await asyncio.sleep(0.03)
 
+    @rx.background
+    async def do_something_event(self):
+        # await self.do_something_method_background()
+        async for event in self.do_something_method(with_self=True):
+            yield event
 
 
 
@@ -55,6 +79,16 @@ class OtherState(rx.State):
         yield PageState.initialize_state(val, second_val)
         print(f"Tried to init val with: {val}, second_val with: {second_val}")
 
+    @rx.background
+    async def await_method_of_another_state_event(self):
+        async with self:
+            page_state = cast(PageState, await self.get_state(PageState))
+
+        async for event in page_state.do_something_method():
+            yield event
+
+
+
 class ExampleComponent(rx.Component):
     value: rx.Var[str] = 'a'
 
@@ -68,22 +102,6 @@ class ExampleComponent(rx.Component):
             **props
         )
 
-
-class AudioState(rx.State):
-    # on_data_available
-    def on_data_available(self, data):
-        print(data)
-
-
-
-module_audio_recorder = AudioRecorderPolyfill.create(
-    id='test-audio-recorder',
-    on_data_available=AudioState.on_data_available,
-    # on_error=AudioState.on_error,
-    # timeslice=AudioState.timeslice,
-    timeslice=10,
-)
-
 @template(route="/component_and_state_testing", title="Component vs State")
 def index() -> rx.Component:
     return rx.container(
@@ -91,34 +109,26 @@ def index() -> rx.Component:
             rx.hstack(
                 rx.text(f'Component vs state'),
             ),
-            rx.hstack(
+            rx.vstack(
                 rx.vstack(
                     rx.text("The State version:"),
-                    rx.text(f'Selected value is: {PageState.value}'),
-                    rx.text(f'Second value is: {PageState.second_value}'),
+                    rx.text(f'PageState.value: {PageState.value}'),
+                    rx.text(f'PageState.second_value: {PageState.second_value}'),
                 ),
-                rx.button('Set via other with one value', on_click=OtherState.run_with_one_value),
+                rx.button('Yield event from OtherState with one value', on_click=OtherState.run_with_one_value),
                 # rx.button('Set via other with second value', on_click=OtherState.run_with_second_value),
-                rx.button('Do something', on_click=PageState.do_something),
+                rx.button('PageState.do_something_event', on_click=PageState.do_something_event),
                 rx.form(
-                    rx.input(name='second_value', placeholder='Second value'),
-                    rx.button('submit'),
+                    rx.hstack(
+                        rx.input(name='second_value', placeholder='Second value', width="200px"),
+                        rx.button('OtherState.run_with_second_value'),
+                        wrap="wrap",
+                    ),
                     on_submit=OtherState.run_with_second_value
-                )
+                ),
+                rx.button('OtherState.await_method_of_another_state_event', on_click=OtherState.await_method_of_another_state_event),
             ),
             rx.divider(),
 
-
-            # ExampleComponent.create(),
-            # rx.divider(),
-            # rx.hstack(
-            #     rx.text('Audio recorder'),
-            #     module_audio_recorder,
-            #     rx.cond(
-            #         module_audio_recorder.is_recording,
-            #         rx.button('Stop recording', on_click=module_audio_recorder.stop),
-            #         rx.button('Start recording', on_click=module_audio_recorder.start),
-            #     ),
-            # )
         ),
     )
