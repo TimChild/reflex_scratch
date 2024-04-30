@@ -1,3 +1,4 @@
+import abc
 import asyncio
 import logging
 import random
@@ -6,7 +7,6 @@ from typing import cast
 
 import reflex as rx
 from reflex import Component
-from reflex_audio_capture import MediaDeviceInfo, AudioRecorderPolyfill
 from ..templates import template
 
 logging.basicConfig(level=logging.INFO)
@@ -14,6 +14,41 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 choices = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+
+
+
+class AnotherMixin(rx.Base):#, abc.ABC):
+    mixin_value: int = 0
+
+    def increment_mixin_sync_event(self):
+        """Works as an event handler directly"""
+        self.mixin_value += 1
+
+    async def increment_mixin_async_event(self):
+        """
+        Works as an event handler directly and yields multiple events.
+        Because it is not a background task, it blocks any other events from occurring
+        """
+        for _ in range(10):
+            self.mixin_value += 1
+            yield
+            await asyncio.sleep(0.1)
+
+    async def increment_mixin_background(self):
+        """This one cannot be implemented as a @rx.background directly in the mixin. But it can implement the logic
+        i.e. using async with self.
+        Then a very simple _event method can be added to the class that it is mixing into.
+        """
+        for i in range(10):
+            async with self:
+                self.mixin_value += 1
+            await asyncio.sleep(0.1)
+
+    @abc.abstractmethod
+    async def increment_mixin_background_event(self):
+        pass
+
+
 
 
 class OptionalSelfMixin:
@@ -30,10 +65,18 @@ class OptionalSelfMixin:
             yield
 
 
-class PageState(OptionalSelfMixin, rx.State):
+class PageState(OptionalSelfMixin, AnotherMixin, rx.State):
 
     value: str = 'a'
     second_value: str = ''
+
+    @rx.background
+    async def increment_mixin_background_event(self):
+        await self.increment_mixin_background()
+
+    # def increment_mixin_value_event(self):
+    # #     self.mixin_value += 1
+    #     return self.increment_mixin_value_method()
 
     def initialize_state(self, value: str, second_value: str = None):
         logger.info(f"Setting value to {value}")
@@ -127,6 +170,12 @@ def index() -> rx.Component:
                     on_submit=OtherState.run_with_second_value
                 ),
                 rx.button('OtherState.await_method_of_another_state_event', on_click=OtherState.await_method_of_another_state_event),
+                rx.divider(),
+                rx.text(f"Mixin value: {PageState.mixin_value}"),
+                rx.button('Increment mixin sync', on_click=PageState.increment_mixin_sync_event),
+                rx.button('Increment mixin async', on_click=PageState.increment_mixin_async_event),
+                rx.button('Increment mixin background', on_click=PageState.increment_mixin_background_event),
+
             ),
             rx.divider(),
 
