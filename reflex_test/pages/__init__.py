@@ -18,6 +18,7 @@ from .select_with_id_testing import index as select_with_id_testing
 from .components_and_states_testing import index as components_and_states_testing
 from .pydantic_v2_to_base import index as pydantic_v2_to_base
 from .dynamic_update_text_area import index as dynamic_update_text_area
+from .stateful_component import index as stateful_component
 
 __all__ = [
     # "settings",
@@ -40,4 +41,5 @@ __all__ = [
     "components_and_states_testing",
     "pydantic_v2_to_base",
     "dynamic_update_text_area",
+    "stateful_component",
 ]
