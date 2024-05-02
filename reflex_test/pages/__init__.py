@@ -1,5 +1,5 @@
 # from .settings import settings
-# from .main_app import main_app
+from .main_app import main_app
 # from .chatroom import chatroom
 # from .webcam import index as webcam
 # from .audio_record import index as audio_record
@@ -19,10 +19,13 @@ from .components_and_states_testing import index as components_and_states_testin
 from .pydantic_v2_to_base import index as pydantic_v2_to_base
 from .dynamic_update_text_area import index as dynamic_update_text_area
 from .stateful_component import index as stateful_component
+from .match_testing import index as match_testing
+
+# from .match_in_fstring_issue import index as match_in_fstring_issue
 
 __all__ = [
     # "settings",
-    # "main_app",
+    "main_app",
     # "chatroom",
     # "webcam",
     # "audio_record",
@@ -42,4 +45,7 @@ __all__ = [
     "pydantic_v2_to_base",
     "dynamic_update_text_area",
     "stateful_component",
+    "match_testing",
+    #
+    # "match_in_fstring_issue",
 ]

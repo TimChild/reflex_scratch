@@ -60,25 +60,6 @@ class ExampleComponent(StatefulComponentBase):
 example_component = ExampleComponent.create
 
 
-class ComponentA(rx.ComponentState):
-    var_a: int = 0
-
-    @classmethod
-    def get_component(cls, *children, **props) -> rx.Component:
-        return rx.card(
-            rx.heading("Component A", size="2"),
-            rx.text(f"Var A: {cls.var_a}"),
-            rx.button("Increment", on_click=cls.increment, color_scheme="green"),
-            rx.button("Decrement", on_click=cls.decrement, color_scheme="red"),
-        )
-
-    def increment(self):
-        self.var_a += 1
-
-    def decrement(self):
-        self.var_a -= 1
-
-
 def my_stateful_component_mixin_layout() -> rx.Component:
     return rx.vstack(
         rx.heading("Stateful Unique Components", size="5"),
@@ -103,9 +84,51 @@ def my_stateful_component_mixin_layout() -> rx.Component:
     )
 
 
+class ComponentA(rx.ComponentState):
+    var_a: int = 0
+
+    @classmethod
+    def get_component(cls, *children, **props) -> rx.Component:
+        return rx.card(
+            rx.heading("Component A", size="2"),
+            rx.text(f"Var A: {cls.var_a}"),
+            rx.button("Increment", on_click=cls.increment, color_scheme="green"),
+            rx.button("Decrement", on_click=cls.decrement, color_scheme="red"),
+        )
+
+    def increment(self):
+        self.var_a += 1
+
+    def decrement(self):
+        self.var_a -= 1
+
+
+
+class StateThatGetsFromComponent(rx.State):
+    value_from_example: int = 0
+    value_from_component_a: int = 0
+
+    async def refresh(self):
+        # With my mixin, I could use knowledge of the specific uid to get the state wherever I want
+        example = await self.get_state(ExampleComponent.get_class('example_a_id'))
+        self.value_from_example = example.value
+
+        # With the built in rx.ComponentState, it relies on getting the object that was created...
+        component_a = await self.get_state(StatefulComponents.a_1.State)
+        self.value_from_component_a = component_a.var_a
+
+
+class StatefulComponents:
+    # Create all Stateful Component objects somewhere that can be accessed anywhere it is needed (i.e. in page for
+    # layout, or in an event handler to extract data from state)
+    # Note: This should be imported locally if in a state outside of the page (although that probably shouldn't be
+    # done anyway). Imports go Component > State > Page.
+    a_1: ComponentA = ComponentA.create()
+
+
 @template(route="/stateful_component_mixin", title="Stateful Unique Components")
 def index() -> rx.Component:
-    a_1 = ComponentA.create()
+    a_1 = StatefulComponents.a_1
     a_2 = ComponentA.create()
 
     return rx.container(
@@ -116,5 +139,11 @@ def index() -> rx.Component:
         a_2,
         rx.text(f"Value in A1: {a_1.State.var_a}"),
         rx.text(f"Value in A2: {a_2.State.var_a}"),
+        rx.divider(),
+        rx.heading("State that gets from component", size="3"),
+        ExampleComponent.create(uid='example_a_id'),
+        rx.text(f'Getting from my mixin {StateThatGetsFromComponent.value_from_example}'),
+        rx.text(f'Getting from rx.ComponentState {StateThatGetsFromComponent.value_from_component_a}'),
+        rx.button("Refresh", on_click=StateThatGetsFromComponent.refresh),
 
     )
