@@ -22,6 +22,7 @@ from .stateful_component import index as stateful_component
 from .match_testing import index as match_testing
 from .set_value_testing import index as set_value_testing
 from .nested_states_example import index as nested_states_example
+from .using_values_in_rxBase import index as using_values_in_rxBase
 
 # from .match_in_fstring_issue import index as match_in_fstring_issue
 
@@ -50,6 +51,7 @@ __all__ = [
     "match_testing",
     "set_value_testing",
     "nested_states_example",
+    "using_values_in_rxBase",
     #
     # "match_in_fstring_issue",
 ]
