@@ -20,6 +20,7 @@ from .pydantic_v2_to_base import index as pydantic_v2_to_base
 from .dynamic_update_text_area import index as dynamic_update_text_area
 from .stateful_component import index as stateful_component
 from .match_testing import index as match_testing
+from .set_value_testing import index as set_value_testing
 from .nested_states_example import index as nested_states_example
 
 # from .match_in_fstring_issue import index as match_in_fstring_issue
@@ -47,6 +48,7 @@ __all__ = [
     "dynamic_update_text_area",
     "stateful_component",
     "match_testing",
+    "set_value_testing",
     "nested_states_example",
     #
     # "match_in_fstring_issue",
