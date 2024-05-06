@@ -149,7 +149,7 @@ class StatesAndComponents:
     a_3 = A.create(3, default_val=100)
 
 
-@template(route='/', title='Passing States between Components Example')
+@template(route='/passing_states_between_components', title='Passing States between Components Example')
 def index() -> rx.Component:
     return rx.container(
         rx.vstack(
