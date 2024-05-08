@@ -176,8 +176,7 @@ def index() -> rx.Component:
             rx.text(
                 "It would also be nice to be able to set the initial values in a ComponentState via the create method."
                 " But the way I've implemented it here ends up making the value fixed."),
-            StatesAndComponents.a_3
-
+            StatesAndComponents.a_3,
         ),
         padding='2em',
     )
