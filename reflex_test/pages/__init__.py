@@ -25,6 +25,7 @@ from .nested_states_example import index as nested_states_example
 from .using_values_in_rxBase import index as using_values_in_rxBase
 from .component_state_in_foreach_issue import index as component_state_in_foreach_issue
 from .redis_mixin_testing import index as redis_mixin_testing
+from .mixin_cached_or_background_issue import index as mixin_cached_or_background_issue
 
 # from .match_in_fstring_issue import index as match_in_fstring_issue
 
@@ -56,6 +57,7 @@ __all__ = [
     "using_values_in_rxBase",
     "component_state_in_foreach_issue",
     "redis_mixin_testing",
+    "mixin_cached_or_background_issue",
     #
     # "match_in_fstring_issue",
 ]
