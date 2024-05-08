@@ -47,13 +47,13 @@ def load_data(data_id: int) -> Data:
     return database.get(data_id, Data(attr_a='', attr_b=''))
 
 class UpdatesMixin(Base):
-    async def updates(self, a_id: int, b_id: int):
+    async def updates(self):
         classes_to_update = [
             DisplayStuff,
         ]
         for c in classes_to_update:
             state = await self.get_state(c)
-            async for e in state.update(a_id=a_id, b_id=b_id):
+            async for e in state.update():
                 yield e
 
 class DoStuffState(UpdatesMixin, rx.State):
@@ -64,7 +64,7 @@ class DoStuffState(UpdatesMixin, rx.State):
         self.a_id = process(data['input_a'])
         self.b_id = process(data['input_b'])
 
-        async for e in self.updates(a_id=self.a_id, b_id=self.b_id):
+        async for e in self.updates():
             yield e
 
 
@@ -75,9 +75,10 @@ class DisplayStuff(rx.State):
     attr_a: str = ""
     attr_b: str = ""
 
-    async def update(self, a_id: int, b_id: int):
-        data_a = load_data(a_id)
-        logger.debug(f'Updating DisplayStuff with {a_id}, {b_id}. Data: {data_a}')
+    async def update(self):
+        doer = await self.get_state(DoStuffState)
+        data_a = load_data(doer.a_id)
+        logger.debug(f'Updating DisplayStuff with Data: {data_a}')
         self.attr_a = data_a.attr_a
         self.attr_b = data_a.attr_b
         yield
