@@ -18,7 +18,7 @@ from reflex.state import RouterData
 from reflex_test.templates import template
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+# logger.setLevel(logging.DEBUG)
 
 
 if TYPE_CHECKING:
@@ -269,6 +269,12 @@ def index() -> rx.Component:
             rx.heading('Mixing together Mixin states', size='5'),
             rx.text(dedent("""
             Working with data that is stored in redis (regular v2 schemas that are serialized/deserialized directly). 
+            
+            This worked well with sync redis, but with async it's not possible to use the cached_var decorator and then
+            it becomes a bit less clear how to handle the display part without loosing all the benefits of only storing
+            the keys in the states.
+            
+            I think there might be a better way to think about the problem...
             """)),
             rx.divider(),
             rx.grid(
