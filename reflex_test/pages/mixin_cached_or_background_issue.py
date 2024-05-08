@@ -4,7 +4,7 @@ import reflex as rx
 from reflex_test.templates import template
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+# logger.setLevel(logging.DEBUG)
 
 
 class BasicMixin(rx.Base):

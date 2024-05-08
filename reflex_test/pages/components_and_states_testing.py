@@ -105,7 +105,7 @@ class OtherState(rx.State):
         """
         When called from another state, this acts like a regular async handler
 
-        It can yield updates, and DOES NOT block the frontend as long as the async with parts are short!
+        It can yield updates, and DOES NOT block the frontend as long as the `async with` parts are short!
         """
         for _ in range(10):
             async with external_state.opt_self(with_self):
@@ -123,7 +123,7 @@ class OtherState(rx.State):
         """
         Similar to above where the async with self is handled by the external state.
         However, the async with self block is broken at the first yield, so have to make sure anything that
-        requires the async with block is don't early (might be more difficult with nested functions?)
+        requires the async with block is done early (might be more difficult with nested functions?)
 
         Also, this DOES block the frontend (because the async with self has to be held open in the background event
         that calls it)
@@ -199,12 +199,14 @@ class PageState(OptionalSelfMixin, AnotherMixin, rx.State):
         async with self:
             self.external_call_value += 1
         await asyncio.sleep(0.5)
+        # This way does not block the frontend
         async for event in OtherState.method_to_be_called_from_external_state_background(self, with_self=True):
             yield event
         await asyncio.sleep(0.5)
         async with self:
             self.external_call_value += 10
         await asyncio.sleep(0.5)
+        # This way blocks the frontend until finished
         async with self:
             async for event in OtherState.method_to_be_called_from_external_state_background_alternative(self):
                 yield event
