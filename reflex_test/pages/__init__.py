@@ -26,6 +26,8 @@ from .using_values_in_rxBase import index as using_values_in_rxBase
 from .component_state_in_foreach_issue import index as component_state_in_foreach_issue
 from .redis_mixin_testing import index as redis_mixin_testing
 from .mixin_cached_or_background_issue import index as mixin_cached_or_background_issue
+from .separation_of_display_from_processing import index as separation_of_display_from_processing
+from .async_cached_var_issue import index as async_cached_var_issue
 
 # from .match_in_fstring_issue import index as match_in_fstring_issue
 
@@ -58,6 +60,8 @@ __all__ = [
     "component_state_in_foreach_issue",
     "redis_mixin_testing",
     "mixin_cached_or_background_issue",
+    "separation_of_display_from_processing",
+    "async_cached_var_issue",
     #
     # "match_in_fstring_issue",
 ]
