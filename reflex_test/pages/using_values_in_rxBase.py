@@ -1,6 +1,10 @@
+import logging
 import reflex as rx
 
 from reflex_test.templates import template
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 class SomeBase(rx.Base):
@@ -25,6 +29,7 @@ class ValsState(rx.State):
         self.base.c += 1
 
 
+
 @template(route='/using_values_in_rxBase', title='Using values in rxBase')
 def index() -> rx.Component:
     return rx.container(
@@ -42,6 +47,8 @@ def index() -> rx.Component:
             ),
             rx.divider(),
             rx.text(f'Value of a + b: {ValsState.a_plus_b}'),
+            rx.divider(),
+
         ),
 
         padding='2em',
