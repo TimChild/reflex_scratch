@@ -1,18 +1,15 @@
 from __future__ import annotations
 
 import logging
-import abc
 import random
-import uuid
 from textwrap import dedent
-from typing import TypeVar, TYPE_CHECKING, Self, Protocol
+from typing import TypeVar, TYPE_CHECKING, Self
 
 import dill
 from fakeredis import FakeRedis
 
 import reflex as rx
 from pydantic import BaseModel
-from reflex.state import RouterData
 
 from reflex_test.templates import template
 
@@ -270,7 +267,7 @@ class A2(DisplayA, Storage2):
     pass
 
 
-@template(route="/mixin_with_redis", title="Mixin with Redis")
+@template(route="/redis_mixin_testing", title="Mixin with Redis")
 def index() -> rx.Component:
     return rx.container(
         rx.vstack(
