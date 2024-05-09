@@ -17,6 +17,7 @@ stripe = "^9.1.0"
 reflex-audio-capture = "^0.0.2"
 fakeredis = "^2.23.0"
 dill = "^0.3.8"
+pydantic = "^2.7.1"
 
 
 [tool.poetry.group.dev.dependencies]
