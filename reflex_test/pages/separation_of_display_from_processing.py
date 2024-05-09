@@ -18,7 +18,11 @@ logger.setLevel(logging.DEBUG)
 if TYPE_CHECKING:
     Base = object
 else:
-    Base = rx.Base
+
+    class Base(rx.Base):
+        class Config:
+            validate_assignment = True
+
 
 database: dict[int, DataA] = {}
 
@@ -48,6 +52,8 @@ class BackendVarsBase(Base):
 class FrontendVarsBase(Base):
     def update(self, *args, **kwargs):
         for key, value in kwargs.items():
+            if key not in self.__fields__:
+                raise ValueError(f"Invalid key {key}")
             setattr(self, key, value)
 
 
@@ -59,8 +65,10 @@ class ControllerBase(Generic[frontend_type, backend_type]):
     linked_states: dict[str, set[FrontendVarsBase | type[rx.State]]] = {}
 
     @classmethod
-    def register(cls, backend_state: backend_type | type[rx.State], frontend_state: frontend_type | type[rx.State]):
-        cls.linked_states.setdefault(backend_state.get_full_name(), set()).add(frontend_state)
+    def register_dependent_state(
+        cls, state: backend_type | frontend_type | type[rx.State], dependent_state: frontend_type | type[rx.State]
+    ):
+        cls.linked_states.setdefault(cls.get_state_full_name(state), set()).add(dependent_state)
 
     def __init__(
         self,
@@ -71,6 +79,15 @@ class ControllerBase(Generic[frontend_type, backend_type]):
         user=None,
         background: bool = False,
     ):
+        """
+        Args:
+            self_state: The callback `self` state (for self.get_state(...) etc)
+            backend_state_class: The state class that stores exclusively backend data (via keys or direct attrs)
+            frontend_state_class: The regular state class that is used for display and interaction with frontend
+            sync_key: A key to use for syncing redis data (applies to backend state only)
+            user: The current user (if applicable) since this is often required
+            background: Whether the current task is a rx.background_task
+        """
         self.self_state = self_state
         self._backend_state_class = backend_state_class
         self._frontend_state_class = frontend_state_class
@@ -83,8 +100,9 @@ class ControllerBase(Generic[frontend_type, backend_type]):
     @asynccontextmanager
     async def with_self(self):
         """
-        If running from a background task, then it's necessary to lock the state for access.
-        This handles doing that in a way that is a noop not in a background task.
+        If running from a background task, this will apply the `async with self` block to allow access to the state.
+        If not running from a background task, then it will just yield and do nothing.
+        I.e. Always use async with self.with_self() whenever it *might* be called from a background task
         """
         if self.background and not self._in_self:
             async with self.self_state:
@@ -98,7 +116,7 @@ class ControllerBase(Generic[frontend_type, backend_type]):
         if not state_class:
             raise ValueError("No state class provided")
         async with self.with_self():
-            # Always get like this, reflex handles caching when possible
+            # Note: reflex handles caching when possible
             loaded_state_vars = cast(backend_type | frontend_type, await self.self_state.get_state(state_class))
         return loaded_state_vars
 
@@ -110,22 +128,30 @@ class ControllerBase(Generic[frontend_type, backend_type]):
         """Get the frontend vars (i.e. get the current frontend state)"""
         return await self._get_vars(self._frontend_state_class)
 
-    async def update_frontend(self, **kwargs):
-        """
-        Update the frontend state(s) with provided kwargs
+    @staticmethod
+    def get_state_full_name(state: rx.State | type[rx.State]) -> str:
+        return state.get_full_name()
 
-        If only a frontend state was provided in init, then only that state will be updated.
-        If a backend state was provided in init, then all dependent frontend states will be updated.
+    async def update_frontend(self, update_dependent_states: bool = True, **kwargs):
+        """
+        Update the frontend state(s) with provided kwargs (also updating any other frontend states that have been
+        registered as dependent on the current backend or frontend state)
         """
         async with self.with_self():
+            # Update all in one block
+
             if self._frontend_state_class:
-                fvars = await self.get_fvars()
-                fvars.update(**kwargs)
-            if self._backend_state_class:
-                bvars = await self.get_bvars()
-                for fvar_class in self.linked_states[bvars.get_full_name()]:
-                    fvars = cast(FrontendVarsBase, await self.self_state.get_state(fvar_class))
-                    fvars.update(**kwargs)
+                # If frontend_state provided in init, then directly update that
+                fvar_state = await self.get_fvars()
+                fvar_state.update(**kwargs)
+
+            if update_dependent_states:
+                for state_class in [self._backend_state_class, self._frontend_state_class]:
+                    if state_class:
+                        name = self.get_state_full_name(state_class)
+                        for dependent_class in self.linked_states.get(name, []):
+                            dep_state = cast(FrontendVarsBase, await self.self_state.get_state(dependent_class))
+                            dep_state.update(**kwargs)
 
 
 NOT_SET = object()
@@ -334,7 +360,7 @@ class FullA(rx.ComponentState):
     ) -> rx.Component:
         cls.backend_state = backend_state
         cls.frontend_state = frontend_state
-        ABController.register(backend_state=backend_state, frontend_state=frontend_state)
+        ABController.register_dependent_state(state=backend_state, dependent_state=frontend_state)
         return display_type_A(
             fvars=cls.frontend_state,
             title=title,
@@ -373,7 +399,7 @@ class FullB(rx.ComponentState):
     ) -> rx.Component:
         cls.frontend_state = frontend_state
         cls.backend_state = backend_state
-        ABController.register(backend_state=backend_state, frontend_state=frontend_state)
+        ABController.register_dependent_state(state=backend_state, dependent_state=frontend_state)
         return display_type_B(
             fvars=cls.frontend_state,
             title=title,
