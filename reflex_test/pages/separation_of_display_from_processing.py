@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import asyncio
 import logging
 import random
+from contextlib import asynccontextmanager
 from textwrap import dedent
 from typing import TYPE_CHECKING, ClassVar, Callable, TypeVar, Generic, cast
 
@@ -45,7 +47,8 @@ class BackendVarsBase(Base):
 
 class FrontendVarsBase(Base):
     def update(self, *args, **kwargs):
-        raise NotImplementedError
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
 
 frontend_type = TypeVar("frontend_type", bound=FrontendVarsBase)
@@ -62,26 +65,67 @@ class ControllerBase(Generic[frontend_type, backend_type]):
     def __init__(
         self,
         self_state: rx.State | rx.ComponentState,
-        backend_state_class: type[rx.State],
+        backend_state_class: type[rx.State] = None,
+        frontend_state_class: type[rx.State] = None,
         sync_key: str = None,
         user=None,
+        background: bool = False,
     ):
         self.self_state = self_state
         self._backend_state_class = backend_state_class
-        self._bvars = None
+        self._frontend_state_class = frontend_state_class
         self.sync_key = sync_key
         self.user = user
+        self.background = background
 
-    async def get_bvars(self, refresh: bool = False) -> backend_type:
-        if self._bvars is None or refresh:
-            self._bvars = await self.self_state.get_state(self._backend_state_class)
-        return self._bvars
+        self._in_self = False
+
+    @asynccontextmanager
+    async def with_self(self):
+        """
+        If running from a background task, then it's necessary to lock the state for access.
+        This handles doing that in a way that is a noop not in a background task.
+        """
+        if self.background and not self._in_self:
+            async with self.self_state:
+                self._in_self = True
+                yield
+                self._in_self = False
+        else:
+            yield
+
+    async def _get_vars(self, state_class: type[rx.State] | None) -> backend_type | frontend_type | None:
+        if not state_class:
+            raise ValueError("No state class provided")
+        async with self.with_self():
+            # Always get like this, reflex handles caching when possible
+            loaded_state_vars = cast(backend_type | frontend_type, await self.self_state.get_state(state_class))
+        return loaded_state_vars
+
+    async def get_bvars(self) -> backend_type:
+        """Get the backend vars (i.e. get the current backend state)"""
+        return await self._get_vars(self._backend_state_class)
+
+    async def get_fvars(self) -> frontend_type:
+        """Get the frontend vars (i.e. get the current frontend state)"""
+        return await self._get_vars(self._frontend_state_class)
 
     async def update_frontend(self, **kwargs):
-        bvars = await self.get_bvars()
-        for fvar_class in self.linked_states.get(bvars.get_full_name(), []):
-            fvars = cast(FrontendVarsBase, await self.self_state.get_state(fvar_class))
-            fvars.update(**kwargs)
+        """
+        Update the frontend state(s) with provided kwargs
+
+        If only a frontend state was provided in init, then only that state will be updated.
+        If a backend state was provided in init, then all dependent frontend states will be updated.
+        """
+        async with self.with_self():
+            if self._frontend_state_class:
+                fvars = await self.get_fvars()
+                fvars.update(**kwargs)
+            if self._backend_state_class:
+                bvars = await self.get_bvars()
+                for fvar_class in self.linked_states[bvars.get_full_name()]:
+                    fvars = cast(FrontendVarsBase, await self.self_state.get_state(fvar_class))
+                    fvars.update(**kwargs)
 
 
 NOT_SET = object()
@@ -112,7 +156,7 @@ class BackendVars(BackendVarsBase):
         if data_b is not NOT_SET:
             self.b_id = await save_data(data_b)
 
-    async def load(self, data_type: type[DataType]) -> DataType:
+    async def load(self, data_type: type[DataType]) -> DataType | None:
         if data_type == DataA:
             return await load_data(self.a_id)
         elif data_type == DataB:
@@ -127,8 +171,11 @@ class FrontendVarsA(FrontendVarsBase):
     b_id_copy: int = 0
     a_repr: str = ""
     b_repr: str = ""
+    background_color: str = "gray"
 
-    def update(self, data_a: DataA = NOT_SET, data_b: DataB = NOT_SET, a_id: int = NOT_SET, b_id: int = NOT_SET):
+    def update(
+        self, data_a: DataA = NOT_SET, data_b: DataB = NOT_SET, a_id: int = NOT_SET, b_id: int = NOT_SET, **kwargs
+    ):
         if data_a is not NOT_SET:
             self.a_repr = str(data_a)
         if data_b is not NOT_SET:
@@ -137,10 +184,15 @@ class FrontendVarsA(FrontendVarsBase):
             self.a_id_copy = a_id
         if b_id is not NOT_SET:
             self.b_id_copy = b_id
+        super().update(**kwargs)
 
 
 def display_type_A(
-    fvars: FrontendVarsA | type[rx.State], title: str, on_click_a: Callable, on_click_b: Callable
+    fvars: FrontendVarsA | type[rx.State],
+    title: str,
+    on_click_a: Callable,
+    on_click_b: Callable,
+    on_click_change_color: Callable,
 ) -> rx.Component:
     return rx.card(
         rx.heading(title, size="6"),
@@ -153,6 +205,8 @@ def display_type_A(
             rx.button("Change A", on_click=on_click_a),
             rx.button("Change B", on_click=on_click_b),
         ),
+        rx.button("Change Background Color", on_click=on_click_change_color),
+        background_color=rx.color(color=fvars.background_color, shade=5),
     )
 
 
@@ -163,7 +217,12 @@ class FrontendVarsB(FrontendVarsBase):
     combined_as: str = ""
     combined_bs: str = ""
 
-    def update(self, data_a: DataA = NOT_SET, data_b: DataB = NOT_SET, a_id: int = NOT_SET, b_id: int = NOT_SET):
+    counting: bool = False
+    count: int = 0
+
+    def update(
+        self, data_a: DataA = NOT_SET, data_b: DataB = NOT_SET, a_id: int = NOT_SET, b_id: int = NOT_SET, **kwargs
+    ):
         if data_a is not NOT_SET:
             self.combined_as = f"<{data_a.foo}, {data_a.bar}, {data_a.baz}>"
         if data_b is not NOT_SET:
@@ -172,6 +231,7 @@ class FrontendVarsB(FrontendVarsBase):
             self.a_id_copy = a_id
         if b_id is not NOT_SET:
             self.b_id_copy = b_id
+        super().update(**kwargs)
 
 
 def display_type_B(
@@ -181,9 +241,17 @@ def display_type_B(
     on_click_change_b: Callable,
     on_click_update_a: Callable,
     on_click_update_b: Callable,
+    on_click_start_counting: Callable,
+    on_click_stop_counting: Callable,
 ) -> rx.Component:
     return rx.card(
-        rx.heading(title),
+        rx.hstack(
+            rx.heading(title),
+            rx.cond(
+                fvars.counting,
+                rx.text(f"Count is at: {fvars.count}"),
+            ),
+        ),
         rx.heading("Alternative view of Data A and B", size="4"),
         rx.grid(
             rx.card("A id:"),
@@ -202,6 +270,8 @@ def display_type_B(
             rx.button("Change B", on_click=on_click_change_b),
             rx.button("Update A", on_click=on_click_update_a),
             rx.button("Update B", on_click=on_click_update_b),
+            rx.button("Start Counting", on_click=on_click_start_counting),
+            rx.button("Stop Counting", on_click=on_click_stop_counting),
             columns="2",
         ),
     )
@@ -223,6 +293,22 @@ class ABController(ControllerBase[FrontendVarsA | FrontendVarsB, BackendVars]):
         await bvars.store(data_b=new_b)
         await self.update_frontend(data_b=new_b, b_id=bvars.b_id)
 
+    async def change_background_color(self):
+        new_color = random.choice(["red", "green", "blue", "yellow", "purple"])
+        await self.update_frontend(background_color=new_color)
+
+    async def start_counting_background(self):
+        await self.update_frontend(counting=True)
+        i = 0
+        while (await self.get_fvars()).counting:
+            i += 1
+            await self.update_frontend(count=i)
+            await asyncio.sleep(1)
+            yield
+
+    async def stop_counting(self):
+        await self.update_frontend(counting=False)
+
 
 class FullA(rx.ComponentState):
     # This is a ComponentState so that it can define event handlers and use self.state (but doesn't actually store
@@ -236,6 +322,9 @@ class FullA(rx.ComponentState):
     async def change_b(self):
         return await ABController(self_state=self, backend_state_class=self.backend_state).change_b()
 
+    async def change_background_color(self):
+        return await ABController(self_state=self, frontend_state_class=self.frontend_state).change_background_color()
+
     @classmethod
     def get_component(
         cls,
@@ -246,7 +335,13 @@ class FullA(rx.ComponentState):
         cls.backend_state = backend_state
         cls.frontend_state = frontend_state
         ABController.register(backend_state=backend_state, frontend_state=frontend_state)
-        return display_type_A(fvars=cls.frontend_state, title=title, on_click_a=cls.change_a, on_click_b=cls.change_b)
+        return display_type_A(
+            fvars=cls.frontend_state,
+            title=title,
+            on_click_a=cls.change_a,
+            on_click_b=cls.change_b,
+            on_click_change_color=cls.change_background_color,
+        )
 
 
 class FullB(rx.ComponentState):
@@ -258,6 +353,16 @@ class FullB(rx.ComponentState):
 
     async def change_b(self):
         return await ABController(self_state=self, backend_state_class=self.backend_state).change_b()
+
+    @rx.background
+    async def start_counting(self):
+        async for event in ABController(
+            self_state=self, frontend_state_class=self.frontend_state, background=True
+        ).start_counting_background():
+            yield event
+
+    async def stop_counting(self):
+        return await ABController(self_state=self, frontend_state_class=self.frontend_state).stop_counting()
 
     @classmethod
     def get_component(
@@ -276,6 +381,8 @@ class FullB(rx.ComponentState):
             on_click_change_b=cls.change_b,
             on_click_update_a=cls.change_a,
             on_click_update_b=cls.change_b,
+            on_click_start_counting=cls.start_counting,
+            on_click_stop_counting=cls.stop_counting,
         )
 
 
@@ -355,16 +462,6 @@ def index() -> rx.Component:
             ),
             rx.divider(),
             rx.hstack(
-                # rx.card(
-                #     rx.heading("DoStuff stuff"),
-                #     rx.form(
-                #         rx.input(name="input_a", placeholder="Input A"),
-                #         rx.input(name="input_b", placeholder="Input B"),
-                #         rx.button("Do Stuff"),
-                #         on_submit=DoStuffState1.do_stuff,
-                #     ),
-                #     rx.text(f"State values: {DoStuffState1.bvars.a_id}, {DoStuffState1.bvars.b_id}"),
-                # ),
                 rx.grid(
                     FullA.create(
                         frontend_state=FrontendVarsAState1,
