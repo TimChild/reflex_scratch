@@ -8,7 +8,7 @@ from .main_app import main_app
 # from .audio_recorder_polyfill import index as audio_recorder_polyfill
 # from .carousel import index as carousel
 # from .scroll_area_width_issue import index as scroll_area_width_issue
-# from .component_with_state import index as component_with_state
+from .component_with_state import index as component_with_state
 from .async_background_testing import index as async_background_testing
 
 # from ..reflex_issues.textarea_set_value_thought import index as textarea_set_value_thought
@@ -43,7 +43,7 @@ __all__ = [
     # "audio_recorder_polyfill",
     # "carousel",
     # "scroll_area_width_issue",
-    # "component_with_state",
+    "component_with_state",
     "async_background_testing",
     # "audio_recorder_2",
     # "textarea_set_value_thought",
