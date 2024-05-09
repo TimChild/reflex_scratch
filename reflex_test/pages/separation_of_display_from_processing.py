@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import random
 from textwrap import dedent
-from typing import TYPE_CHECKING, ClassVar, Callable, TypeVar
+from typing import TYPE_CHECKING, ClassVar, Callable, TypeVar, Generic, cast
 
 import reflex as rx
 from pydantic import BaseModel
@@ -21,15 +21,6 @@ else:
 database: dict[int, DataA] = {}
 
 
-async def process(input_a: str):
-    global database
-    # Stand in for an async processing function that stores result in db and returns only the id
-    data = DataA(attr_a=input_a.title(), attr_b=input_a.upper())
-    next_id = len(database)
-    database[next_id] = data
-    return next_id
-
-
 async def save_data(data: BaseModel) -> int:
     global database
     # Stand in for an async save to db function
@@ -42,6 +33,55 @@ async def load_data(data_id: int) -> BaseModel | None:
     global database
     # Stand in for an async load from db function
     return database.get(data_id, None)
+
+
+class BackendVarsBase(Base):
+    async def store(self, *args, **kwargs):
+        raise NotImplementedError
+
+    async def load(self, *args, **kwargs):
+        raise NotImplementedError
+
+
+class FrontendVarsBase(Base):
+    def update(self, *args, **kwargs):
+        raise NotImplementedError
+
+
+frontend_type = TypeVar("frontend_type", bound=FrontendVarsBase)
+backend_type = TypeVar("backend_type", bound=BackendVarsBase)
+
+
+class ControllerBase(Generic[frontend_type, backend_type]):
+    linked_states: dict[str, set[FrontendVarsBase | type[rx.State]]] = {}
+
+    @classmethod
+    def register(cls, backend_state: backend_type | type[rx.State], frontend_state: frontend_type | type[rx.State]):
+        cls.linked_states.setdefault(backend_state.get_full_name(), set()).add(frontend_state)
+
+    def __init__(
+        self,
+        self_state: rx.State | rx.ComponentState,
+        backend_state_class: type[rx.State],
+        sync_key: str = None,
+        user=None,
+    ):
+        self.self_state = self_state
+        self._backend_state_class = backend_state_class
+        self._bvars = None
+        self.sync_key = sync_key
+        self.user = user
+
+    async def get_bvars(self, refresh: bool = False) -> backend_type:
+        if self._bvars is None or refresh:
+            self._bvars = await self.self_state.get_state(self._backend_state_class)
+        return self._bvars
+
+    async def update_frontend(self, **kwargs):
+        bvars = await self.get_bvars()
+        for fvar_class in self.linked_states.get(bvars.get_full_name(), []):
+            fvars = cast(FrontendVarsBase, await self.self_state.get_state(fvar_class))
+            fvars.update(**kwargs)
 
 
 NOT_SET = object()
@@ -60,19 +100,6 @@ class DataB(BaseModel):
 
 
 DataType = TypeVar("DataType", DataA, DataB)
-
-
-class BackendVarsBase(Base):
-    async def store(self, *args, **kwargs):
-        raise NotImplementedError
-
-    async def load(self, *args, **kwargs):
-        raise NotImplementedError
-
-
-class FrontendVarsBase(Base):
-    def update(self, *args, **kwargs):
-        raise NotImplementedError
 
 
 class BackendVars(BackendVarsBase):
@@ -95,6 +122,7 @@ class BackendVars(BackendVarsBase):
 
 
 class FrontendVarsA(FrontendVarsBase):
+    # Stand in for basic display of data (e.g. main app)
     a_id_copy: int = 0
     b_id_copy: int = 0
     a_repr: str = ""
@@ -129,6 +157,7 @@ def display_type_A(
 
 
 class FrontendVarsB(FrontendVarsBase):
+    # Stand in for a much more comprehensive display of data (e.g. run info)
     a_id_copy: int = 0
     b_id_copy: int = 0
     combined_as: str = ""
@@ -178,42 +207,21 @@ def display_type_B(
     )
 
 
-class ABController:
-    linked_states: dict[str, set[FrontendVarsBase | type[rx.State]]] = {}
-
-    @classmethod
-    def register(cls, backend_state: BackendVars | type[rx.State], frontend_state: FrontendVarsBase | type[rx.State]):
-        cls.linked_states.setdefault(backend_state.get_full_name(), set()).add(frontend_state)
-
-    def __init__(
-        self,
-        self_state: rx.State,
-        fvars: FrontendVarsBase | list[FrontendVarsBase] = None,
-        bvars: BackendVarsBase = None,
-        sync_key: str = None,
-        user=None,
-    ):
-        self.self_state = self_state
-        self.fvars = fvars if isinstance(fvars, list) else [fvars] if fvars else []
-        self.bvars = bvars
-        self.sync_key = sync_key
-        self.user = user
+class ABController(ControllerBase[FrontendVarsA | FrontendVarsB, BackendVars]):
+    # Handle processing related to BackedVars (Data A and B)
+    # Note: This is a regular class, so no weird inheritance from reflex
 
     async def change_a(self):
         new_a = DataA(foo=random.randint(0, 100), bar=random.randint(0, 100), baz=random.randint(0, 100))
-        await self.bvars.store(data_a=new_a)
-        for fvar_class in self.linked_states.get(self.bvars.get_full_name(), []):
-            fvars = await self.self_state.get_state(fvar_class)
-            fvars.update(data_a=new_a, a_id=self.bvars.a_id)
-        return
+        bvars = await self.get_bvars()
+        await bvars.store(data_a=new_a)
+        await self.update_frontend(data_a=new_a, a_id=bvars.a_id)
 
     async def change_b(self):
         new_b = DataB(fe=str(random.randint(0, 100)), fi=str(random.randint(0, 100)), fo=str(random.randint(0, 100)))
-        await self.bvars.store(data_b=new_b)
-        for fvar_class in self.linked_states.get(self.bvars.get_full_name(), []):
-            fvars = await self.self_state.get_state(fvar_class)
-            fvars.update(data_b=new_b, b_id=self.bvars.b_id)
-        return
+        bvars = await self.get_bvars()
+        await bvars.store(data_b=new_b)
+        await self.update_frontend(data_b=new_b, b_id=bvars.b_id)
 
 
 class FullA(rx.ComponentState):
@@ -223,12 +231,10 @@ class FullA(rx.ComponentState):
     frontend_state: ClassVar[type[rx.State]]
 
     async def change_a(self):
-        bvars = await self.get_state(self.backend_state)
-        return await ABController(self_state=self, bvars=bvars).change_a()
+        return await ABController(self_state=self, backend_state_class=self.backend_state).change_a()
 
     async def change_b(self):
-        bvars = await self.get_state(self.backend_state)
-        return await ABController(self_state=self, bvars=bvars).change_b()
+        return await ABController(self_state=self, backend_state_class=self.backend_state).change_b()
 
     @classmethod
     def get_component(
@@ -240,10 +246,7 @@ class FullA(rx.ComponentState):
         cls.backend_state = backend_state
         cls.frontend_state = frontend_state
         ABController.register(backend_state=backend_state, frontend_state=frontend_state)
-        component = display_type_A(
-            fvars=cls.frontend_state, title=title, on_click_a=cls.change_a, on_click_b=cls.change_b
-        )
-        return component
+        return display_type_A(fvars=cls.frontend_state, title=title, on_click_a=cls.change_a, on_click_b=cls.change_b)
 
 
 class FullB(rx.ComponentState):
@@ -251,12 +254,10 @@ class FullB(rx.ComponentState):
     frontend_state: ClassVar[type[rx.State]]
 
     async def change_a(self):
-        bvars = await self.get_state(self.backend_state)
-        return await ABController(self_state=self, bvars=bvars).change_a()
+        return await ABController(self_state=self, backend_state_class=self.backend_state).change_a()
 
     async def change_b(self):
-        bvars = await self.get_state(self.backend_state)
-        return await ABController(self_state=self, bvars=bvars).change_b()
+        return await ABController(self_state=self, backend_state_class=self.backend_state).change_b()
 
     @classmethod
     def get_component(
@@ -268,8 +269,7 @@ class FullB(rx.ComponentState):
         cls.frontend_state = frontend_state
         cls.backend_state = backend_state
         ABController.register(backend_state=backend_state, frontend_state=frontend_state)
-
-        component = display_type_B(
+        return display_type_B(
             fvars=cls.frontend_state,
             title=title,
             on_click_change_a=cls.change_a,
@@ -277,7 +277,6 @@ class FullB(rx.ComponentState):
             on_click_update_a=cls.change_a,
             on_click_update_b=cls.change_b,
         )
-        return component
 
 
 class BackendVarsState1(BackendVars, rx.State):
