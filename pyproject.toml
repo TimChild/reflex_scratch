@@ -7,7 +7,8 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-reflex = "^0.4.8"
+#reflex = "^0.4.8"
+reflex = { path = "../reflex"}
 google-auth = {extras = ["requests"], version = "^2.29.0"}
 python-dotenv = "^1.0.1"
 reflex-webcam = "^0.0.5"

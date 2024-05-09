@@ -1412,11 +1412,9 @@ name = "reflex"
 version = "0.4.9"
 description = "Web apps in pure Python."
 optional = false
-python-versions = "<4.0,>=3.8"
-files = [
-    {file = "reflex-0.4.9-py3-none-any.whl", hash = "sha256:7210a1af9e50db97866619f8c9a18f9cde25c08890f96a7d33e00a9a8bfc6074"},
-    {file = "reflex-0.4.9.tar.gz", hash = "sha256:d549f29a2e14e23dd28ecfb04fb95f0f032fcab6b9176c84b836b6b74c5c6c97"},
-]
+python-versions = "^3.8"
+files = []
+develop = false
 
 [package.dependencies]
 alembic = ">=1.11.1,<2.0"
@@ -1425,7 +1423,7 @@ charset-normalizer = ">=3.3.2,<4.0"
 dill = ">=0.3.8,<0.4"
 distro = {version = ">=1.8.0,<2.0", markers = "sys_platform == \"linux\""}
 fastapi = ">=0.96.0,<1.0"
-gunicorn = ">=20.1.0,<22.0"
+gunicorn = ">=20.1.0,<23.0"
 httpx = ">=0.25.1,<1.0"
 jinja2 = ">=3.1.2,<4.0"
 packaging = ">=23.1,<25.0"
@@ -1452,6 +1450,10 @@ watchdog = ">=2.3.1,<5.0"
 watchfiles = ">=0.19.0,<1.0"
 wheel = ">=0.42.0,<1.0"
 wrapt = {version = ">=1.14.0,<2.0", markers = "python_version >= \"3.11\""}
+
+[package.source]
+type = "directory"
+url = "../reflex"
 
 [[package]]
 name = "reflex-audio-capture"
@@ -2345,4 +2347,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "14db09daa3566d6a10c405b171d7f9b3a49409e68d5009a70b81402829eb830d"
+content-hash = "d9b0c737a5f633cb7d4b47950dba4c38af362a1a874866237e5e0fe6619d33b8"
