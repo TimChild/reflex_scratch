@@ -1,15 +1,8 @@
-
 from __future__ import annotations
 
 import logging
-import abc
-import random
-import uuid
 from textwrap import dedent
-from typing import TypeVar, TYPE_CHECKING, Self, Protocol
-
-import dill
-from fakeredis import FakeRedis
+from typing import TYPE_CHECKING
 
 import reflex as rx
 from pydantic import BaseModel
@@ -19,16 +12,15 @@ from reflex_test.templates import template
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-
 if TYPE_CHECKING:
     Base = object
 else:
     Base = rx.Base
 
-
 database: dict[int, Data] = {}
 
-def process(input_a: str):
+
+async def process(input_a: str):
     global database
     # Stand in for an async processing function that stores result in db and returns only the id
     data = Data(attr_a=input_a.title(), attr_b=input_a.upper())
@@ -36,70 +28,101 @@ def process(input_a: str):
     database[next_id] = data
     return next_id
 
+
+async def load_data(data_id: int) -> Data:
+    global database
+    # Stand in for an async load from db function
+    return database.get(data_id, Data(attr_a="", attr_b=""))
+
+
+class ABController:
+    def __init__(
+        self,
+        self_state: rx.State,
+        fvars: rx.Base = None,
+        bvars: rx.Base = None,
+        display_state: rx.State = None,
+        sync_key: str = None,
+        user=None,
+    ):
+        self.self_state = self_state
+        self.fvars = fvars
+        self.bvars = bvars
+        self.display_state = display_state
+        self.sync_key = sync_key
+        self.user = user
+
+    async def do_stuff(self, data: dict[str, str]):
+        self.bvars.a_id = process(data["input_a"])
+        self.bvars.b_id = process(data["input_b"])
+        yield
+
+
 class Data(BaseModel):
     attr_a: str
     attr_b: str
 
 
-def load_data(data_id: int) -> Data:
-    global database
-    # Stand in for an async load from db function
-    return database.get(data_id, Data(attr_a='', attr_b=''))
-
-class UpdatesMixin(Base):
-    async def updates(self):
-        classes_to_update = [
-            DisplayStuff,
-        ]
-        for c in classes_to_update:
-            state = await self.get_state(c)
-            async for e in state.update():
-                yield e
-
-class DoStuffState(UpdatesMixin, rx.State):
+class BackendVars(rx.Base):
     a_id: int = 0
     b_id: int = 0
 
-    async def do_stuff(self, data: dict[str, str]):
-        self.a_id = process(data['input_a'])
-        self.b_id = process(data['input_b'])
 
-        async for e in self.updates():
-            yield e
-
-
-
-class DisplayStuff(rx.State):
-    # Not inheriting from DoStuffState because this state may need to load a lot of data, but the DoStuffState only
-    # needs to store ids or keys
+class FrontendVarsA(rx.Base):
     attr_a: str = ""
     attr_b: str = ""
 
-    async def update(self):
-        doer = await self.get_state(DoStuffState)
-        data_a = load_data(doer.a_id)
-        logger.debug(f'Updating DisplayStuff with Data: {data_a}')
-        self.attr_a = data_a.attr_a
-        self.attr_b = data_a.attr_b
-        yield
+
+class DoStuffMixin(rx.Base):
+    bvars: BackendVars = BackendVars()
+
+    async def do_stuff(self, data: dict[str, str]):
+        async for e in ABController(self_state=self, bvars=self.bvars).do_stuff(data):
+            yield e
+
+
+class DoStuffState(DoStuffMixin, rx.State):
+    # Separately define with state in case multiple components need to use the same processing state
+    # Could even subclass rx.ComponentState here?
+    pass
+
+
+class DisplayStuff(rx.State):
+    fvars: FrontendVarsA = FrontendVarsA()
 
     @classmethod
     def get_component(cls, title: str) -> rx.Component:
         return rx.card(
             rx.heading(title),
-            rx.text(f'Attribute A: {cls.attr_a}'),
-            rx.text(f'Attribute B: {cls.attr_b}'),
+            rx.text(f"Attribute A: {cls.fvars.attr_a}"),
+            rx.text(f"Attribute B: {cls.fvars.attr_b}"),
         )
 
 
+class FrontendVarsB(rx.Base):
+    combined_as: str = ""
+    combined_bs: str = ""
 
 
-@template(route='/separation_of_processing_and_display', title='Separation of processing and display')
+class AnotherDisplayStuff(rx.State):
+    fvars: FrontendVarsB = FrontendVarsB()
+
+    @classmethod
+    def get_component(cls, title: str) -> rx.Component:
+        return rx.card(
+            rx.heading(title),
+            rx.text(f"Combined Attribute A: {cls.fvars.combined_as}"),
+            rx.text(f"Combined Attribute B: {cls.fvars.combined_bs}"),
+        )
+
+
+@template(route="/separation_of_processing_and_display", title="Separation of processing and display")
 def index() -> rx.Component:
     return rx.container(
         rx.vstack(
-            rx.heading('Separation of processing and display', size='5'),
-            rx.markdown(dedent("""
+            rx.heading("Separation of processing and display", size="5"),
+            rx.markdown(
+                dedent("""
             Overall aim is to make it easier to separate the code related to event handling and processing of data from
             the displaying of that data.
 
@@ -123,23 +146,26 @@ def index() -> rx.Component:
             different ways, but **only** if that information is stored in the state already. 
             Additional data can be loaded based on database/redis keys, but then do I store that data back into the
             same shared state that the others use?
-            """)),
-            rx.divider(),
-            rx.card(
-              rx.heading('DoStuff stuff'),
-                rx.form(
-                    rx.input(name='input_a', placeholder='Input A'),
-                    rx.input(name='input_b', placeholder='Input B'),
-                    rx.button('Do Stuff'),
-                    on_submit=DoStuffState.do_stuff,
-                ),
-                rx.text(f'State values: {DoStuffState.a_id}, {DoStuffState.b_id}')
+            """)
             ),
-            rx.grid(
-                DisplayStuff.get_component('Display A'),
-                columns='3'
+            rx.divider(),
+            rx.hstack(
+                rx.card(
+                    rx.heading("DoStuff stuff"),
+                    rx.form(
+                        rx.input(name="input_a", placeholder="Input A"),
+                        rx.input(name="input_b", placeholder="Input B"),
+                        rx.button("Do Stuff"),
+                        on_submit=DoStuffState.do_stuff,
+                    ),
+                    rx.text(f"State values: {DoStuffState.bvars.a_id}, {DoStuffState.bvars.b_id}"),
+                ),
+                rx.grid(
+                    DisplayStuff.get_component(title="Display A"),
+                    AnotherDisplayStuff.get_component("Display B"),
+                    columns="3",
+                ),
             ),
         ),
-
-        padding='2em',
+        padding="2em",
     )
