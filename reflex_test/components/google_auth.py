@@ -46,9 +46,7 @@ class AuthState(rx.State):
     @rx.var
     def token_is_valid(self) -> bool:
         try:
-            return bool(
-                self.tokeninfo and int(self.tokeninfo.get("exp", 0)) > time.time()
-            )
+            return bool(self.tokeninfo and int(self.tokeninfo.get("exp", 0)) > time.time())
         except Exception:
             return False
 

@@ -84,9 +84,7 @@ def main_app() -> rx.Component:
             rx.divider(),
             rx.text("Debugging info:"),
             # rx.text_area(value=UserState.info, read_only=True, width='100%'),
-            rx.chakra.text_area(
-                value=UserState.info, width="100%", rows=10, is_read_only=True
-            ),
+            rx.chakra.text_area(value=UserState.info, width="100%", rows=10, is_read_only=True),
             # rx.text(f'Current user: {UserState.user}'),
             rx.button("Login", on_click=UserState.init_auth),
         ),

@@ -17,6 +17,7 @@ from ..templates import template
 }
 """
 
+
 class ExtendedScrollArea(ScrollArea):
     # Allowed values are: ['none', 'x', 'y', 'block', 'inline', 'both', 'mandatory', 'proximity']
     # including combinations like 'x mandatory', 'y proximity'
@@ -25,6 +26,7 @@ class ExtendedScrollArea(ScrollArea):
 
 
 extended_scroll_area = ExtendedScrollArea.create
+
 
 def scroll_test_layout() -> rx.Component:
     item = rx.card(

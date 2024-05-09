@@ -1,9 +1,12 @@
 """Stripe UI components."""
+
 from typing import Any
 
 import reflex as rx
 
-STRIPE_PUBLIC_KEY = "pk_test_51P5VScRqabseNwj7Bhfkh5uZKkVM5mdD0Cws9vQZvgw5siZMJcjz4h3jGaRrLoVUvzOAtYImuLh6xQqy0nVDMk8o00VyOyGUCc"
+STRIPE_PUBLIC_KEY = (
+    "pk_test_51P5VScRqabseNwj7Bhfkh5uZKkVM5mdD0Cws9vQZvgw5siZMJcjz4h3jGaRrLoVUvzOAtYImuLh6xQqy0nVDMk8o00VyOyGUCc"
+)
 
 LOAD_STRIPE_SCRIPT = f"""
 const stripePromise = loadStripe('{STRIPE_PUBLIC_KEY}');

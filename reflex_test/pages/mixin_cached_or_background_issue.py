@@ -14,13 +14,13 @@ class BasicMixin(rx.Base):
 
     @rx.var
     def var_a(self) -> int:
-        logger.debug('var_a called')
-        return self.a+10
+        logger.debug("var_a called")
+        return self.a + 10
 
     @rx.cached_var
     def cached_a(self) -> int:
-        logger.debug('cached_a called')
-        return self.a+20
+        logger.debug("cached_a called")
+        return self.a + 20
 
     def increment_a(self):
         self.a += 1
@@ -37,30 +37,31 @@ class BasicMixin(rx.Base):
 class StateWithBasicMixin(BasicMixin, rx.State):
     pass
 
-@template(route='/mixin_cached_or_background_issue', title='Mixin Cached or Background Issue')
+
+@template(route="/mixin_cached_or_background_issue", title="Mixin Cached or Background Issue")
 def index() -> rx.Component:
     return rx.container(
         rx.vstack(
-            rx.heading('Mixin Cached or Background Issue', size='5'),
+            rx.heading("Mixin Cached or Background Issue", size="5"),
             rx.grid(
-                rx.text('Attr a:'),
+                rx.text("Attr a:"),
                 rx.text(StateWithBasicMixin.a),
-                rx.text('Var a:'),
+                rx.text("Var a:"),
                 rx.text(StateWithBasicMixin.var_a),
-                rx.text('Cached a:'),
+                rx.text("Cached a:"),
                 rx.text(StateWithBasicMixin.cached_a),
-                rx.text('Attr b:'),
+                rx.text("Attr b:"),
                 rx.text(StateWithBasicMixin.b),
-                rx.text('Attr c:'),
+                rx.text("Attr c:"),
                 rx.text(StateWithBasicMixin.c),
-                columns='5',
-                rows='2',
-                flow='column'
+                columns="5",
+                rows="2",
+                flow="column",
             ),
             rx.hstack(
-                rx.button('Increment a', on_click=StateWithBasicMixin.increment_a),
-                rx.button('Increment b', on_click=StateWithBasicMixin.increment_b),
-                rx.button('Increment c', on_click=StateWithBasicMixin.increment_c),
+                rx.button("Increment a", on_click=StateWithBasicMixin.increment_a),
+                rx.button("Increment b", on_click=StateWithBasicMixin.increment_b),
+                rx.button("Increment c", on_click=StateWithBasicMixin.increment_c),
             ),
         ),
         padding="2em",

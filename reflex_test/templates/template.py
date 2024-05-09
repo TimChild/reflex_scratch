@@ -50,10 +50,7 @@ def menu_button() -> rx.Component:
                 background_color=styles.accent_color,
             ),
             rx.menu.content(
-                *[
-                    menu_item_link(page["title"], page["route"])
-                    for page in get_decorated_pages()
-                ],
+                *[menu_item_link(page["title"], page["route"]) for page in get_decorated_pages()],
                 rx.menu.separator(),
                 menu_item_link("Logout", "/logout"),
             ),

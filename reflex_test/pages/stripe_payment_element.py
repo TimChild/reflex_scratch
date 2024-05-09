@@ -1,11 +1,14 @@
 """The payment page."""
+
 import reflex as rx
 import stripe
 
 from ..components.stripe_payment_element import payment_element, stripe_elements
 from ..templates import template
 
-STRIPE_SECRET_KEY = "sk_test_51P5VScRqabseNwj7yyzulqSLi2qnargWEpmePpLm2JkIimG3IxKafplNoehrijgp4jgEiama7JKUWHdLL6toHwQF00QIYAeyuT"
+STRIPE_SECRET_KEY = (
+    "sk_test_51P5VScRqabseNwj7yyzulqSLi2qnargWEpmePpLm2JkIimG3IxKafplNoehrijgp4jgEiama7JKUWHdLL6toHwQF00QIYAeyuT"
+)
 stripe.api_key = STRIPE_SECRET_KEY
 
 
@@ -53,7 +56,8 @@ def index() -> rx.Component:
                 stripe_elements(
                     rx.form(
                         rx.vstack(
-                            payment_element(), rx.button("Submit", width="100%"),
+                            payment_element(),
+                            rx.button("Submit", width="100%"),
                         )
                     ),
                     options=dict(

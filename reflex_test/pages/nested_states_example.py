@@ -10,11 +10,21 @@ class A(rx.ComponentState):
     val_a: int = 1
 
     @classmethod  # <<< By the way, if this is missing, the compilation error is pretty cryptic
-    def get_component(cls, index: int, *args, handle_submission: Callable | None = None, default_val: int = None, fixed_val: int = None,
-                      **kwargs):
+    def get_component(
+        cls,
+        index: int,
+        *args,
+        handle_submission: Callable | None = None,
+        default_val: int = None,
+        fixed_val: int = None,
+        **kwargs,
+    ):
         # It's pretty easy to use handlers from Higher level components in the layout of this component
-        additional_button = rx.button('Trigger the HighLevelSubmission',
-                                      on_click=handle_submission) if handle_submission else rx.fragment()
+        additional_button = (
+            rx.button("Trigger the HighLevelSubmission", on_click=handle_submission)
+            if handle_submission
+            else rx.fragment()
+        )
 
         if fixed_val:
             cls.fixed_val = fixed_val  # <<< This is a way to set a value on the class that is fixed
@@ -24,10 +34,10 @@ class A(rx.ComponentState):
             cls.val_a = default_val
 
         return rx.card(
-            rx.text(f'A: {index}'),
-            rx.text(f'val_a: {cls.val_a}, fixed_val: {cls.fixed_val}'),
-            rx.button('Increment', on_click=cls.increment),
-            rx.button('Decrement', on_click=cls.decrement),
+            rx.text(f"A: {index}"),
+            rx.text(f"val_a: {cls.val_a}, fixed_val: {cls.fixed_val}"),
+            rx.button("Increment", on_click=cls.increment),
+            rx.button("Decrement", on_click=cls.decrement),
             additional_button,
         )
 
@@ -43,8 +53,9 @@ class B(rx.ComponentState):
     complicated_value: int = 0
 
     val_a_reference: rx.Var[int] = None  # <<< Ideally this would reference the val_a from the associated A component
-    state_a: ClassVar[type[
-        rx.State]] = None  # <<< Or at least this could hold a reference to the state class that the value comes from.
+    state_a: ClassVar[type[rx.State]] = (
+        None  # <<< Or at least this could hold a reference to the state class that the value comes from.
+    )
 
     @classmethod
     def get_component(cls, index: int, val_a: int | rx.Var[int], state_a: type[rx.State], *args, **kwargs):
@@ -58,18 +69,21 @@ class B(rx.ComponentState):
         # cls.val_a_reference = val_a
 
         return rx.card(
-            rx.text(f'B: {index}'),
-            rx.text("Imagine this one needs to know the value of an A component to work. "
-                    "It's easy to use the A.val_a in the layout of this component", weight='bold'),
-            rx.text(f'val_b: {cls.val_b}'),
-            rx.text(f'val_a + val_b: {val_a + cls.val_b}'),
-            rx.button('Increment', on_click=cls.increment),
-            rx.button('Decrement', on_click=cls.decrement),
+            rx.text(f"B: {index}"),
+            rx.text(
+                "Imagine this one needs to know the value of an A component to work. "
+                "It's easy to use the A.val_a in the layout of this component",
+                weight="bold",
+            ),
+            rx.text(f"val_b: {cls.val_b}"),
+            rx.text(f"val_a + val_b: {val_a + cls.val_b}"),
+            rx.button("Increment", on_click=cls.increment),
+            rx.button("Decrement", on_click=cls.decrement),
             rx.divider(),
-            rx.text("But I'm not sure how I could use that in a calculated var or event handler", weight='bold'),
+            rx.text("But I'm not sure how I could use that in a calculated var or event handler", weight="bold"),
             # rx.text(f'Result of a cached_var that uses val_a and cls.val_b: {cls.cached_example}'),
-            rx.button('Do something complicated with val_a and val_b', on_click=cls.do_complicated_stuff),
-            rx.text(f'complicated_value: {cls.complicated_value}'),
+            rx.button("Do something complicated with val_a and val_b", on_click=cls.do_complicated_stuff),
+            rx.text(f"complicated_value: {cls.complicated_value}"),
         )
 
     @classmethod
@@ -112,7 +126,7 @@ class B(rx.ComponentState):
         # Thought about trying to get the whole state
         val_a = cast(A, await self.get_state(self.state_a)).val_a
         # But get an AttributeError: NoneType object has no attribute `get_full_name`
-        self.complicated_value=self.val_b ** val_a  # placeholder for something that would actually require server-side
+        self.complicated_value = self.val_b**val_a  # placeholder for something that would actually require server-side
 
 
 class HighLevelState(rx.State):
@@ -138,6 +152,7 @@ class StatesAndComponents:
     This is useful if I want to access states from this page in another page, then I know I only have to look in this
     class. And I can quickly and easily see if I am using States from other places here too.
     """
+
     high_level = HighLevelState
 
     a = A.create(1, fixed_val=10)
@@ -149,34 +164,39 @@ class StatesAndComponents:
     a_3 = A.create(3, default_val=100)
 
 
-@template(route='/passing_states_between_components', title='Passing States between Components Example')
+@template(route="/passing_states_between_components", title="Passing States between Components Example")
 def index() -> rx.Component:
     return rx.container(
         rx.vstack(
-            rx.heading('Nested States Example', size='5'),
+            rx.heading("Nested States Example", size="5"),
             rx.divider(),
             rx.text(
                 "I have several groups of components that are almost standalone and work nicely with ComponentState",
-                weight='bold'),
+                weight="bold",
+            ),
             rx.grid(
-                StatesAndComponents.a, StatesAndComponents.b, StatesAndComponents.a_2, StatesAndComponents.b_2,
+                StatesAndComponents.a,
+                StatesAndComponents.b,
+                StatesAndComponents.a_2,
+                StatesAndComponents.b_2,
                 columns="2",
-                rows="2"
+                rows="2",
             ),
             rx.divider(),
-            rx.text('Then I have some higher level states that use values from those components', weight='bold'),
-            rx.button('Main submission', on_click=StatesAndComponents.high_level.handle_submission),
+            rx.text("Then I have some higher level states that use values from those components", weight="bold"),
+            rx.button("Main submission", on_click=StatesAndComponents.high_level.handle_submission),
             rx.card(
-                rx.text('Main output'),
+                rx.text("Main output"),
                 rx.divider(),
-                rx.text('The main result from the HighLevelState (adding all 4 values together is):', weight='bold'),
+                rx.text("The main result from the HighLevelState (adding all 4 values together is):", weight="bold"),
                 rx.text(StatesAndComponents.high_level.main_result),
             ),
             rx.divider(),
             rx.text(
                 "It would also be nice to be able to set the initial values in a ComponentState via the create method."
-                " But the way I've implemented it here ends up making the value fixed."),
+                " But the way I've implemented it here ends up making the value fixed."
+            ),
             StatesAndComponents.a_3,
         ),
-        padding='2em',
+        padding="2em",
     )

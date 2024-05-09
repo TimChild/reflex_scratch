@@ -24,24 +24,26 @@ class MultiSelectComponentState(rx.ComponentState):
 
     @classmethod
     def get_component(cls, *children, **props) -> rx.Component:
-            on_change = props.pop("on_change", [])
-            if not isinstance(on_change, list):
-                on_change = [on_change]
+        on_change = props.pop("on_change", [])
+        if not isinstance(on_change, list):
+            on_change = [on_change]
 
-            value = props.get('value', None)
-            if value is None:
-                value = cls.component_state_value
-                on_change = [cls.set_component_state_value, *on_change]
-            else:
-                if not on_change:
-                    raise ValueError("MultiSelectComponent requires an on_change event handler if value is set.")
+        value = props.get("value", None)
+        if value is None:
+            value = cls.component_state_value
+            on_change = [cls.set_component_state_value, *on_change]
+        else:
+            if not on_change:
+                raise ValueError("MultiSelectComponent requires an on_change event handler if value is set.")
 
-            return MultiSelectComponent.create(
-                *children,
-                value=value,
-                on_change=on_change,
-                **props,
+        return MultiSelectComponent.create(
+            *children,
+            value=value,
+            on_change=on_change,
+            **props,
         )
+
+
 multiselect = MultiSelectComponentState.create
 
 # @rx.page(route="/multi_select", title="Multi Select")

@@ -56,9 +56,7 @@ def index() -> rx.Component:
     return rx.box(
         rx.fragment(
             rx.vstack(
-                rx.heading(
-                    "Problem where the rx.scroll_area width is not constrained to the parent box width."
-                ),
+                rx.heading("Problem where the rx.scroll_area width is not constrained to the parent box width."),
                 scroll_area_part(),
                 height="100%",
             )

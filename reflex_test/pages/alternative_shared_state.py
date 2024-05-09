@@ -66,9 +66,7 @@ class State(rx.State):
             self.clientToken = self.get_token()
 
         # Mark this state's token as belonging to the clientToken
-        shared_sessions_by_token.setdefault(self.clientToken, set()).add(
-            self.get_token()
-        )
+        shared_sessions_by_token.setdefault(self.clientToken, set()).add(self.get_token())
 
         # Mark this state's websocket id as belonging to the clientToken and state token
         tokens_by_sid[self.get_sid()] = (self.clientToken, self.get_token())
@@ -117,9 +115,7 @@ def disconnect_handler(sid):
     orig_disconnect(sid)
 
     clientToken, token = tokens_by_sid.get(sid, (None, None))
-    print(
-        f"Disconnect event received for {sid}. Removing {token} from shared {clientToken}"
-    )
+    print(f"Disconnect event received for {sid}. Removing {token} from shared {clientToken}")
 
     shared_sessions_by_token.get(clientToken, set()).discard(token)
     tokens_by_sid.pop(sid, None)

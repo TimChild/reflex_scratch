@@ -12,6 +12,7 @@ class SomeBase(rx.Base):
     b: int = 0
     c: int = 0
 
+
 class ValsState(rx.State):
     base: SomeBase = SomeBase()
 
@@ -29,27 +30,23 @@ class ValsState(rx.State):
         self.base.c += 1
 
 
-
-@template(route='/using_values_in_rxBase', title='Using values in rxBase')
+@template(route="/using_values_in_rxBase", title="Using values in rxBase")
 def index() -> rx.Component:
     return rx.container(
         rx.vstack(
-
-            rx.heading('Using values in rxBase', size='5'),
+            rx.heading("Using values in rxBase", size="5"),
             rx.divider(),
-            rx.text(f'Value of a: {ValsState.base.a}'),
-            rx.text(f'Value of b: {ValsState.base.b}'),
-            rx.text(f'Value of c: {ValsState.base.c}'),
+            rx.text(f"Value of a: {ValsState.base.a}"),
+            rx.text(f"Value of b: {ValsState.base.b}"),
+            rx.text(f"Value of c: {ValsState.base.c}"),
             rx.hstack(
-                rx.button('Increment a', on_click=ValsState.increment_a),
-                rx.button('Increment b', on_click=ValsState.increment_b),
-                rx.button('Increment c', on_click=ValsState.increment_c),
+                rx.button("Increment a", on_click=ValsState.increment_a),
+                rx.button("Increment b", on_click=ValsState.increment_b),
+                rx.button("Increment c", on_click=ValsState.increment_c),
             ),
             rx.divider(),
-            rx.text(f'Value of a + b: {ValsState.a_plus_b}'),
+            rx.text(f"Value of a + b: {ValsState.a_plus_b}"),
             rx.divider(),
-
         ),
-
-        padding='2em',
+        padding="2em",
     )

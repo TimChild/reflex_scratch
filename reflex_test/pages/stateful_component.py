@@ -49,10 +49,10 @@ class ExampleComponent(StatefulComponentBase):
     def component(cls) -> rx.Component:
         return rx.card(
             rx.heading("Example Component", size="2"),
-            rx.text(f'Selected value is: {cls.value}'),
+            rx.text(f"Selected value is: {cls.value}"),
             rx.hstack(
-                rx.button('Increment', on_click=cls.increment, color_scheme='green'),
-                rx.button('Decrement', on_click=cls.decrement, color_scheme='red'),
+                rx.button("Increment", on_click=cls.increment, color_scheme="green"),
+                rx.button("Decrement", on_click=cls.decrement, color_scheme="red"),
             ),
         )
 
@@ -65,20 +65,19 @@ def my_stateful_component_mixin_layout() -> rx.Component:
         rx.heading("Stateful Unique Components", size="5"),
         rx.divider(),
         rx.hstack(
-            example_component(uid='1'),
+            example_component(uid="1"),
             example_component(uid="2"),
             example_component(uid="3"),
         ),
         rx.divider(),
-        rx.heading(
-            "Accessing values from the components with provided uid", size="3"),
+        rx.heading("Accessing values from the components with provided uid", size="3"),
         rx.hstack(
             rx.card(rx.text(f"{ExampleComponent.get_class('1').value}", weight="bold")),
             rx.card(rx.text(f"{ExampleComponent.get_class('2').value}", weight="bold")),
             rx.card(rx.text(f"{ExampleComponent.get_class('3').value}", weight="bold")),
         ),
         rx.divider(),
-        rx.heading('Can also just create standalone components', size="3"),
+        rx.heading("Can also just create standalone components", size="3"),
         example_component(),
         example_component(),
     )
@@ -103,14 +102,13 @@ class ComponentA(rx.ComponentState):
         self.var_a -= 1
 
 
-
 class StateThatGetsFromComponent(rx.State):
     value_from_example: int = 0
     value_from_component_a: int = 0
 
     async def refresh(self):
         # With my mixin, I could use knowledge of the specific uid to get the state wherever I want
-        example = await self.get_state(ExampleComponent.get_class('example_a_id'))
+        example = await self.get_state(ExampleComponent.get_class("example_a_id"))
         self.value_from_example = example.value
 
         # With the built in rx.ComponentState, it relies on getting the object that was created...
@@ -141,9 +139,8 @@ def index() -> rx.Component:
         rx.text(f"Value in A2: {a_2.State.var_a}"),
         rx.divider(),
         rx.heading("State that gets from component", size="3"),
-        ExampleComponent.create(uid='example_a_id'),
-        rx.text(f'Getting from my mixin {StateThatGetsFromComponent.value_from_example}'),
-        rx.text(f'Getting from rx.ComponentState {StateThatGetsFromComponent.value_from_component_a}'),
+        ExampleComponent.create(uid="example_a_id"),
+        rx.text(f"Getting from my mixin {StateThatGetsFromComponent.value_from_example}"),
+        rx.text(f"Getting from rx.ComponentState {StateThatGetsFromComponent.value_from_component_a}"),
         rx.button("Refresh", on_click=StateThatGetsFromComponent.refresh),
-
     )

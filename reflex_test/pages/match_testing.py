@@ -43,6 +43,7 @@ def calc_max_value(current_model: str) -> rx.Var[int]:
         10000,
     )
 
+
 def get_match_str(current_model: str) -> rx.Var[str]:
     return rx.match(
         current_model,
@@ -52,7 +53,6 @@ def get_match_str(current_model: str) -> rx.Var[str]:
         ("d", "s_250"),
         "s_10000",
     )
-
 
 
 class ExampleComponentState(rx.ComponentState):
@@ -76,16 +76,16 @@ def index():
     example_component = ExampleComponentState.create(match_value=MatchState.value)
     return rx.container(
         rx.vstack(
-            rx.heading('Testing the rx.Match condition', size="5"),
+            rx.heading("Testing the rx.Match condition", size="5"),
             rx.divider(),
             rx.card(
                 rx.select(
-                    ['a', 'b', 'c', 'd'],
-                    default_value='a',
+                    ["a", "b", "c", "d"],
+                    default_value="a",
                     on_change=MatchState.on_change,
                 ),
                 rx.text(f"Value of MatchState.value: {MatchState.value}"),
-                background_color=rx.color('orange', alpha=True),
+                background_color=rx.color("orange", alpha=True),
             ),
             rx.divider(),
             rx.hstack(
@@ -93,40 +93,35 @@ def index():
                     rx.heading("Matching to str to display rx.texts"),
                     rx.match(
                         MatchState.value,
-                        ("a", rx.text("Matched a", color_scheme='yellow')),
-                        ("b", rx.text("Matched b", color_scheme='red')),
-                        ("c", rx.text("Matched c", color_scheme='green')),
-                        ("d", rx.text("Matched d", color_scheme='blue')),
-                    )
+                        ("a", rx.text("Matched a", color_scheme="yellow")),
+                        ("b", rx.text("Matched b", color_scheme="red")),
+                        ("c", rx.text("Matched c", color_scheme="green")),
+                        ("d", rx.text("Matched d", color_scheme="blue")),
+                    ),
                 ),
             ),
             rx.divider(),
             rx.hstack(
                 rx.card(
                     rx.heading("Matching to str to determine the color_scheme of rx.text"),
-                    rx.text('Some text where color_scheme depends on match', color_scheme=rx.match(
-                        MatchState.value,
-                        ("a", 'yellow'),
-                        ("b", 'red'),
-                        ("c", 'green'),
-                        ("d", 'blue'),
-                        'purple'
-                    ))
+                    rx.text(
+                        "Some text where color_scheme depends on match",
+                        color_scheme=rx.match(
+                            MatchState.value, ("a", "yellow"), ("b", "red"), ("c", "green"), ("d", "blue"), "purple"
+                        ),
+                    ),
                 )
             ),
             rx.divider(),
             rx.hstack(
                 rx.card(
                     rx.heading("Matching to str to determine background_color of rx.text"),
-                    rx.text('Some text where background_color depends on match', background_color=rx.match(
-                        MatchState.value,
-                        ("a", 'yellow'),
-                        ("b", 'red'),
-                        ("c", 'green'),
-                        ("d", 'blue'),
-                        "purple"
-
-                    ))
+                    rx.text(
+                        "Some text where background_color depends on match",
+                        background_color=rx.match(
+                            MatchState.value, ("a", "yellow"), ("b", "red"), ("c", "green"), ("d", "blue"), "purple"
+                        ),
+                    ),
                 )
             ),
             rx.divider(),
@@ -144,8 +139,9 @@ def index():
                             ("c", 1000),
                             ("d", 250),
                             3,
-                        )),
-                    rx.text(f'Slider value is: {SliderState.value}')
+                        ),
+                    ),
+                    rx.text(f"Slider value is: {SliderState.value}"),
                 )
             ),
             rx.divider(),
@@ -158,7 +154,7 @@ def index():
                         min=0,
                         max=calc_max_value(MatchState.value),
                     ),
-                    rx.text(f'Slider value is: {SliderState.value}')
+                    rx.text(f"Slider value is: {SliderState.value}"),
                 )
             ),
             rx.divider(),
@@ -166,21 +162,22 @@ def index():
                 rx.card(
                     rx.heading("ComponentState with function rx.match to determine max value"),
                     example_component,
-                    rx.text(f'ExampleComponentState.State.value is: {example_component.State.value}')
+                    rx.text(f"ExampleComponentState.State.value is: {example_component.State.value}"),
                 )
             ),
             rx.divider(),
             rx.hstack(
                 rx.card(
                     rx.heading("Using rx.match to determine value within a string"),
-                    rx.hstack(rx.text('Calling the match as the only child of text: '),
-                              rx.text(calc_max_value(MatchState.value))),
+                    rx.hstack(
+                        rx.text("Calling the match as the only child of text: "),
+                        rx.text(calc_max_value(MatchState.value)),
+                    ),
                     # rx.text(f'Calling the match as part of fstring: {get_match_str(MatchState.value)}'),
-                    rx.text(f'Calling the match as part of fstring: DOES NOT WORK'),
-                    rx.text(f'Calling as second child of rx.text: ', calc_max_value(MatchState.value)),
+                    rx.text(f"Calling the match as part of fstring: DOES NOT WORK"),
+                    rx.text(f"Calling as second child of rx.text: ", calc_max_value(MatchState.value)),
                 )
             ),
         ),
-
         padding_y="2em",
     )

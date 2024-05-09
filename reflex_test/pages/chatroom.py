@@ -38,12 +38,8 @@ class ChatroomState(rx.State):
 
     async def send_message(self) -> None:
         """Broadcast chat message to other connected clients."""
-        m = Message(
-            username=self.current_username, sent=time.time(), message=self.input_message
-        )
-        await broadcast_event(
-            "state.chatroom_state.incoming_message", payload=dict(message=m)
-        )
+        m = Message(username=self.current_username, sent=time.time(), message=self.input_message)
+        await broadcast_event("state.chatroom_state.incoming_message", payload=dict(message=m))
         self.input_message = ""
 
     @rx.var
@@ -129,11 +125,5 @@ async def broadcast_usernames() -> None:
 
     usernames = []
     for state in app.state_manager.states.values():
-        usernames.append(
-            state.get_substate(
-                ChatroomState.get_full_name().split(".")
-            ).current_username
-        )
-    await broadcast_event(
-        "state.chatroom_state.set_usernames", payload=dict(usernames=usernames)
-    )
+        usernames.append(state.get_substate(ChatroomState.get_full_name().split(".")).current_username)
+    await broadcast_event("state.chatroom_state.set_usernames", payload=dict(usernames=usernames))

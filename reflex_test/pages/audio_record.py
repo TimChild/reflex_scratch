@@ -17,11 +17,7 @@ class MyAudioState(rx.State):
     def update_from_url(self, url: str):
         print(f"Event: , Audio url: {url}")
         self.audio_url = str(url)
-        return [
-            rx.call_script(
-                f"""download_blob("{url}")""", callback=MyAudioState.save_audio
-            )
-        ]
+        return [rx.call_script(f"""download_blob("{url}")""", callback=MyAudioState.save_audio)]
         # return AudioState.transcribe_audio
 
     def save_audio(self, b64_str):

@@ -30,7 +30,7 @@ class SomeState(rx.State):
 
     def handle_update_text_area(self):
         # Ideally, something like this would be nice
-        yield rx.set_value(ref='textarea_id', value="Starting text that could be loaded from db etc.")
+        yield rx.set_value(ref="textarea_id", value="Starting text that could be loaded from db etc.")
 
     def handle_update_text_area_set_value(self):
         # Ideally wouldn't need this
@@ -40,6 +40,8 @@ class SomeState(rx.State):
 """
 Ideally, something like this would work
 """
+
+
 @rx.page(route="/good_text_area", title="Example Good")
 def index() -> rx.Component:
     return rx.container(
@@ -55,18 +57,21 @@ def index() -> rx.Component:
         rx.cond(
             SomeState.submission_valid,
             rx.box("Valid submission", background_color="green"),
-            rx.box("Invalid submission", background_color='red'),
+            rx.box("Invalid submission", background_color="red"),
         ),
-        rx.text(f'Submitted text: {SomeState.submitted_text}'),
+        rx.text(f"Submitted text: {SomeState.submitted_text}"),
         rx.heading("Computed value:"),
         rx.text(SomeState.submission_valid),
         # Ideally would be able to use something like this
         rx.button("Set starting text", on_click=SomeState.handle_update_text_area),
     )
 
+
 """
 Instead, have to do this
 """
+
+
 @rx.page(route="/bad_text_area", title="Example Bad")
 def index() -> rx.Component:
     return rx.container(
@@ -83,13 +88,11 @@ def index() -> rx.Component:
         rx.cond(
             SomeState.submission_valid,
             rx.box("Valid submission", background_color="green"),
-            rx.box("Invalid submission", background_color='red'),
+            rx.box("Invalid submission", background_color="red"),
         ),
-        rx.text(f'Submitted text: {SomeState.submitted_text}'),
+        rx.text(f"Submitted text: {SomeState.submitted_text}"),
         rx.heading("Computed value:"),
         rx.text(SomeState.submission_valid),
         # Ideally would be able to use something like this
-        rx.button(
-            "Set starting text", on_click=SomeState.handle_update_text_area_set_value
-        ),
+        rx.button("Set starting text", on_click=SomeState.handle_update_text_area_set_value),
     )

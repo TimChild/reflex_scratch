@@ -24,6 +24,7 @@ from ..templates import template
 class Bar(rx.Base):
     text_value: str = "Some other value"
 
+
 class TextAreaState(rx.State):
     text_area_value: str = "Initial text area value"
     foo: Bar = Bar()
@@ -44,7 +45,6 @@ class TextAreaState(rx.State):
 
 
 class OtherTextAreaState(rx.State):
-
     @rx.background
     async def update_text_area(self):
         async with self:
@@ -56,7 +56,6 @@ class OtherTextAreaState(rx.State):
         # Doesn't work
         dynamic_state.foo.text_value = uuid.uuid4().hex
         yield
-
 
 
 @template(
@@ -78,5 +77,5 @@ def index() -> rx.Component:
         rx.hstack(
             rx.text("Update from different state"),
             rx.button("Update via different state", on_click=OtherTextAreaState.update_text_area),
-        )
+        ),
     )

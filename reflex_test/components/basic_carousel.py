@@ -34,13 +34,7 @@ class Carousel(rx.Component):
     def _get_imports(self) -> imports.ImportDict:
         return imports.merge_imports(
             super()._get_imports(),
-            {
-                "": {
-                    imports.ImportVar(
-                        tag="react-responsive-carousel/lib/styles/carousel.min.css"
-                    )
-                }
-            },
+            {"": {imports.ImportVar(tag="react-responsive-carousel/lib/styles/carousel.min.css")}},
         )
 
     # If the tag is the default export from the module, you can set is_default = True.
