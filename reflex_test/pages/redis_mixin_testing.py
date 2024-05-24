@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import random
 from textwrap import dedent
-from typing import TypeVar, TYPE_CHECKING, Self
+from typing import TypeVar, Self
 
 import dill
 from fakeredis import FakeRedis
@@ -16,11 +16,6 @@ from reflex_test.templates import template
 logger = logging.getLogger(__name__)
 # logger.setLevel(logging.DEBUG)
 
-
-if TYPE_CHECKING:
-    Base = object
-else:
-    Base = rx.Base
 
 model_type = TypeVar("model_type", bound=BaseModel)
 
@@ -39,7 +34,7 @@ class B(BaseModel):
     fo: str = "fo"
 
 
-class StorageBase(Base):
+class StorageBase(rx.State, mixin=True):
     """
     Base mixin for storing data in redis to be shared between states etc. Defaults to per tab storage, but with
     a group_key provided will store data per that group (probably user_id or similar).
@@ -98,14 +93,14 @@ class StorageBase(Base):
         return f"{group_key}:{self.get_full_name()}:{attr}:{key}"
 
 
-class ABStorageMixin(StorageBase):
+class ABStorageMixin(StorageBase, mixin=True):
     key_a: int = 0
     key_b: int = 0
     # key_a: str = ''
     # key_b: str = ''
 
 
-class ProcessA(ABStorageMixin):
+class ProcessA(ABStorageMixin, mixin=True):
     def handle_change_a(self):
         logger.debug("Changing A")
         # new_key = uuid.uuid4().hex[:4]
@@ -131,7 +126,7 @@ class ProcessA(ABStorageMixin):
         self.key_b = new_key
 
 
-class ProcessB(ABStorageMixin):
+class ProcessB(ABStorageMixin, mixin=True):
     def update_a(self):
         logger.debug("Updating A")
         a = self.load("key_a", self.key_a, A)
@@ -152,7 +147,7 @@ class ProcessB(ABStorageMixin):
             self.store("key_b", self.key_b, b)
 
 
-class DisplayA(ProcessA):
+class DisplayA(ProcessA, mixin=True):
     """Anything directly related to what will be displayed to user and user interaction (i.e. including setting the
     on_click for event handlers etc. (but can refer to methods in ProcessBase)"""
 
@@ -195,7 +190,7 @@ class DisplayA(ProcessA):
         logger.debug("---" * 20)
 
 
-class DisplayB(ProcessB, ProcessA):
+class DisplayB(ProcessB, ProcessA, mixin=True):
     @rx.cached_var
     def a(self) -> str:
         logger.debug("DispB: Getting A")
@@ -247,11 +242,11 @@ class DisplayB(ProcessB, ProcessA):
         logger.debug("---" * 20)
 
 
-class Storage1(ABStorageMixin, rx.State):
+class Storage1(ABStorageMixin):
     pass
 
 
-class Storage2(ABStorageMixin, rx.State):
+class Storage2(ABStorageMixin):
     pass
 
 

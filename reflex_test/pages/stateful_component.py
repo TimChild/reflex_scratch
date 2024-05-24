@@ -6,7 +6,7 @@ import reflex as rx
 from reflex_test.templates import template
 
 
-class StatefulComponentBase(rx.Base):
+class StatefulComponentBase(rx.State, mixin=True):
     _unique_int: ClassVar[int] = 0  # Just so class names don't end up super long
     _instance_mapping: ClassVar[dict[str, Self]] = {}
 
@@ -19,7 +19,8 @@ class StatefulComponentBase(rx.Base):
 
         # Create a new type with a unique name inhering from this cls and rx.State as bases
         cls._unique_int += 1
-        unique_cls: type = type(f"{cls.__name__}_{cls._unique_int}", (cls, rx.State), {})
+        # unique_cls: type = type(f"{cls.__name__}_{cls._unique_int}", (cls, rx.State), {})
+        unique_cls: type = type(f"{cls.__name__}_{cls._unique_int}", (cls,), {})
         cls._instance_mapping[uid] = unique_cls
         return unique_cls
 

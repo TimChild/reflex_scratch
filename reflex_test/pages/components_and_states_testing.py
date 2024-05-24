@@ -2,12 +2,10 @@ import abc
 import asyncio
 import logging
 import random
-import uuid
 from contextlib import asynccontextmanager
-from typing import cast, ClassVar, Self, Protocol, TYPE_CHECKING
+from typing import cast
 
 import reflex as rx
-from reflex import Component
 from ..templates import template
 
 logging.basicConfig(level=logging.INFO)
@@ -17,7 +15,7 @@ logger.setLevel(logging.INFO)
 choices = ["a", "b", "c", "d", "e", "f", "g"]
 
 
-class AnotherMixin(rx.Base):  # , abc.ABC):
+class AnotherMixin(rx.State, mixin=True):  # , abc.ABC):
     mixin_value: int = 0
 
     def increment_mixin_sync_event(self):
@@ -231,7 +229,7 @@ def index() -> rx.Component:
     return rx.container(
         rx.vstack(
             rx.hstack(
-                rx.text(f"Component vs state"),
+                rx.text("Component vs state"),
             ),
             rx.vstack(
                 rx.vstack(

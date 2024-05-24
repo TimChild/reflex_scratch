@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 # logger.setLevel(logging.DEBUG)
 
 
-class BasicMixin(rx.Base):
+class BasicMixin(rx.State, mixin=True):
     a: int = 0
     b: int = 0
     c: int = 0

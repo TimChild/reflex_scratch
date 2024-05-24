@@ -44,7 +44,7 @@ class HandlerState(rx.State):
         self.data_id = data_id
 
 
-class DisplayMixin(rx.Base):
+class DisplayMixin(rx.State, mixin=True):
     @rx.cached_var
     def data_a_cached(self) -> str:
         data = load_data(self.data_id)
@@ -60,7 +60,7 @@ class DisplayState(DisplayMixin, HandlerState):
     pass
 
 
-class AlternativeDisplayMixin(rx.Base):
+class AlternativeDisplayMixin(rx.State, mixin=True):
     data_attr_a: str = ""
     data_attr_b: str = ""
 

@@ -17,8 +17,9 @@ class Comp(rx.ComponentState):
 @template(route="/component_state_in_foreach_issue", title="Component State in Foreach Issue")
 def index() -> rx.Component:
     return rx.container(
-        rx.foreach(
-            [1, 2, 3],
-            Comp.create,
-        ),
+        # rx.foreach(
+        #     [1, 2, 3],
+        #     Comp.create,
+        # ),
+        rx.text("Patched in 0.5.0 to raise an error at compile if trying to use Component.create in a foreach loop."),
     )
