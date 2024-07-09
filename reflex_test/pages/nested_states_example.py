@@ -1,4 +1,4 @@
-from typing import cast, Callable, ClassVar
+from typing import cast, Callable, ClassVar, Union
 
 import reflex as rx
 
@@ -12,9 +12,9 @@ class A(rx.ComponentState):
     @classmethod  # <<< By the way, if this is missing, the compilation error is pretty cryptic
     def get_component(
         cls,
-        index: int,
+        index_: int,
         *args,
-        handle_submission: Callable | None = None,
+        handle_submission: Union[Callable, None] = None,
         default_val: int = None,
         fixed_val: int = None,
         **kwargs,
@@ -34,7 +34,7 @@ class A(rx.ComponentState):
             cls.val_a = default_val
 
         return rx.card(
-            rx.text(f"A: {index}"),
+            rx.text(f"A: {index_}"),
             rx.text(f"val_a: {cls.val_a}, fixed_val: {cls.fixed_val}"),
             rx.button("Increment", on_click=cls.increment),
             rx.button("Decrement", on_click=cls.decrement),
@@ -91,7 +91,7 @@ class B(rx.ComponentState):
         # Copied from rx.ComponentState.create
         cls._per_component_state_instance_count += 1
         state_cls_name = f"{cls.__name__}_n{cls._per_component_state_instance_count}"
-        component_state = type(state_cls_name, (cls, rx.State), {})
+        component_state = type(state_cls_name, (cls, rx.State), {}, mixin=False)
         component = component_state.get_component(index, val_a, state_a, *children, **props)
         component.State = component_state
         ####
