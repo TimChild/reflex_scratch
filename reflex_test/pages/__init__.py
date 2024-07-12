@@ -25,13 +25,14 @@ from .stateful_component import index as stateful_component
 from .match_testing import index as match_testing
 from .set_value_testing import index as set_value_testing
 from .nested_states_example import index as nested_states_example
-from .using_values_in_rxBase import index as using_values_in_rxBase
+from .using_values_in_rx_base import index as using_values_in_rx_base
 from .component_state_in_foreach_issue import index as component_state_in_foreach_issue
 from .redis_mixin_testing import index as redis_mixin_testing
 from .mixin_cached_or_background_issue import index as mixin_cached_or_background_issue
 from .separation_of_display_from_processing import index as separation_of_display_from_processing
 from .async_cached_var_issue import index as async_cached_var_issue
 from .inherit_multiple_mixin import index as inherit_multiple_mixin
+from .pydantic_v2_test import index as pydantic_v2_test
 
 # from .match_in_fstring_issue import index as match_in_fstring_issue
 
@@ -60,7 +61,7 @@ __all__ = [
     "match_testing",
     "set_value_testing",
     "nested_states_example",
-    "using_values_in_rxBase",
+    "using_values_in_rx_base",
     "component_state_in_foreach_issue",
     "redis_mixin_testing",
     "mixin_cached_or_background_issue",
@@ -69,4 +70,5 @@ __all__ = [
     "inherit_multiple_mixin",
     #
     # "match_in_fstring_issue",
+    "pydantic_v2_test",
 ]
