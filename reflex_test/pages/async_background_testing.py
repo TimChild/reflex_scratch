@@ -1,11 +1,9 @@
 import asyncio
-from typing import List
 
 import reflex as rx
 
 from reflex_test.templates import template
 
-from ..components import multiselect
 
 
 class DifferentState(rx.State):

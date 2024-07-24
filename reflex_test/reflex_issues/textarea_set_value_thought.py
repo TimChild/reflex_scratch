@@ -37,46 +37,16 @@ class SomeState(rx.State):
         self.current_value = "Starting text that could be loaded from db etc."
 
 
-"""
-Ideally, something like this would work
-"""
-
-
-@rx.page(route="/good_text_area", title="Example Good")
+@rx.page(route="/text_area", title="Text area example")
 def index() -> rx.Component:
     return rx.container(
         rx.heading("Example"),
         rx.form(
-            rx.text_area(
-                id="textarea_id",
-                name="text",
-            ),
-            rx.button("Submit"),
-            on_submit=SomeState.handle_form_submission,
-        ),
-        rx.cond(
-            SomeState.submission_valid,
-            rx.box("Valid submission", background_color="green"),
-            rx.box("Invalid submission", background_color="red"),
-        ),
-        rx.text(f"Submitted text: {SomeState.submitted_text}"),
-        rx.heading("Computed value:"),
-        rx.text(SomeState.submission_valid),
-        # Ideally would be able to use something like this
-        rx.button("Set starting text", on_click=SomeState.handle_update_text_area),
-    )
-
-
-"""
-Instead, have to do this
-"""
-
-
-@rx.page(route="/bad_text_area", title="Example Bad")
-def index() -> rx.Component:
-    return rx.container(
-        rx.heading("Example"),
-        rx.form(
+            # Ideally would use this
+            # rx.text_area(
+            #     id="textarea_id",
+            #     name="text",
+            # ),
             rx.text_area(
                 name="text",
                 value=SomeState.current_value,
@@ -94,5 +64,6 @@ def index() -> rx.Component:
         rx.heading("Computed value:"),
         rx.text(SomeState.submission_valid),
         # Ideally would be able to use something like this
+        # rx.button("Set starting text", on_click=SomeState.handle_update_text_area),
         rx.button("Set starting text", on_click=SomeState.handle_update_text_area_set_value),
     )

@@ -1,9 +1,6 @@
-from textwrap import dedent
 import reflex as rx
 
-from typing import Dict, Any, List
-import reflex as rx
-from reflex.vars import Var
+from typing import Any
 import base64
 
 from reflex_test.templates import template

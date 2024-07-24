@@ -7,7 +7,7 @@ class Comp(rx.ComponentState):
     value: int = 0
 
     @classmethod
-    def get_component(cls, v, *children, **props) -> "Component":
+    def get_component(cls, v, *children, **props) -> rx.Component:
         return rx.card(
             rx.text(f"This one works > {v}"),  # <<< This alone works
             # rx.text(f"This one does not > {cls.value}"),  # <<< Adding this causes error

@@ -174,8 +174,8 @@ def index():
                         rx.text(calc_max_value(MatchState.value)),
                     ),
                     # rx.text(f'Calling the match as part of fstring: {get_match_str(MatchState.value)}'),
-                    rx.text(f"Calling the match as part of fstring: DOES NOT WORK"),
-                    rx.text(f"Calling as second child of rx.text: ", calc_max_value(MatchState.value)),
+                    rx.text("Calling the match as part of fstring: DOES NOT WORK"),
+                    rx.text("Calling as second child of rx.text: ", calc_max_value(MatchState.value)),
                 )
             ),
         ),

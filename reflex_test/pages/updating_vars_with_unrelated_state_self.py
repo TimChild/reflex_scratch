@@ -29,13 +29,16 @@ class UnrelatedState(rx.State):
             s = await self.get_state(StateWithVars)
             some_vars = s.some_vars
             some_vars.var1 += 1
-        yield rx.toast("Updated var1 after getting state", duration=2000)
+            var2 = some_vars.var2
+        yield rx.toast(
+            "Updated some_vars.var1 directly after getting state and saved some_vars.var2 as var2", duration=2000
+        )
         await asyncio.sleep(1)
         async with self:
             some_vars.var1 -= 1
-            some_vars.var2 += 1
+            var2 += 1
         yield rx.toast(
-            "Updated var1 and var2 without getting from state again (did both 'Some Vars' values change?)",
+            "Updated some_vars.var1 and var2 without getting from state again (only the some_vars.var1 updates though)",
             duration=2000,
         )
         await asyncio.sleep(1)
