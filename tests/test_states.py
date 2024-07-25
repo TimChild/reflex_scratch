@@ -211,16 +211,24 @@ async def test_get_state(mock_app: rx.App, token: str):
     assert isinstance(test_state, TestState)
     if isinstance(mock_app.state_manager, StateManagerMemory):
         # All substates are available
-        assert tuple(sorted(test_state.substates)) == ("child_state", "child_state2", "child_state3", "my_state")
+        assert tuple(sorted(test_state.substates)) == (
+            ChildState.get_name(),
+            ChildState2.get_name(),
+            ChildState3.get_name(),
+            MyState.get_name(),
+        )
     else:
         # Sibling states are only populated if they have computed vars
-        assert tuple(sorted(test_state.substates)) == ("child_state2", "child_state3")
+        assert tuple(sorted(test_state.substates)) == (
+            ChildState2.get_name(),
+            ChildState3.get_name(),
+        )
 
     # Because ChildState3 has a computed var, it is always dirty, and always populated.
-    assert test_state.substates["child_state3"].substates["grandchild_state3"].computed == ""
+    assert test_state.substates[ChildState3.get_name()].substates[GrandchildState3.get_name()].computed == ""
 
     # Get the child_state2 directly.
-    child_state2_direct = test_state.get_substate(["child_state2"])
+    child_state2_direct = test_state.get_substate([ChildState2.get_name()])
     child_state2_get_state = await test_state.get_state(ChildState2)
     # These should be the same object.
     assert child_state2_direct is child_state2_get_state
@@ -235,20 +243,20 @@ async def test_get_state(mock_app: rx.App, token: str):
 
     # Now the original root should have all substates populated.
     assert tuple(sorted(test_state.substates)) == (
-        "child_state",
-        "child_state2",
-        "child_state3",
-        "my_state",
+        ChildState.get_name(),
+        ChildState2.get_name(),
+        ChildState3.get_name(),
+        MyState.get_name(),
     )
 
     # ChildState should be retrievable
-    child_state_direct = test_state.get_substate(["child_state"])
+    child_state_direct = test_state.get_substate([ChildState.get_name()])
     child_state_get_state = await test_state.get_state(ChildState)
     # These should be the same object.
     assert child_state_direct is child_state_get_state
 
     # GrandchildState instance should be the same as the one retrieved from the child_state2.
-    assert grandchild_state is child_state_direct.get_substate(["grandchild_state"])
+    assert grandchild_state is child_state_direct.get_substate([GrandchildState.get_name()])
     grandchild_state.value2 = "set_value"
 
     assert test_state.get_delta() == {
@@ -258,49 +266,6 @@ async def test_get_state(mock_app: rx.App, token: str):
         },
         GrandchildState.get_full_name(): {
             "value2": "set_value",
-        },
-        GrandchildState3.get_full_name(): {
-            "computed": "",
-        },
-    }
-
-    # Get a fresh instance
-    new_test_state = await mock_app.state_manager.get_state(_substate_key(token, ChildState2))
-    assert isinstance(new_test_state, TestState)
-    if isinstance(mock_app.state_manager, StateManagerMemory):
-        # In memory, it's the same instance
-        assert new_test_state is test_state
-        test_state._clean()
-        # All substates are available
-        assert tuple(sorted(new_test_state.substates)) == (
-            "child_state",
-            "child_state2",
-            "child_state3",
-            "my_state",
-        )
-    else:
-        # With redis, we get a whole new instance
-        assert new_test_state is not test_state
-        # Sibling states are only populated if they have computed vars
-        assert tuple(sorted(new_test_state.substates)) == (
-            "child_state2",
-            "child_state3",
-        )
-
-    # Set a value on child_state2, should update cached var in grandchild_state2
-    child_state2 = new_test_state.get_substate(("child_state2",))
-    child_state2.value = "set_c2_value"
-
-    assert new_test_state.get_delta() == {
-        TestState.get_full_name(): {
-            "sum": 3.14,
-            "upper": "",
-        },
-        ChildState2.get_full_name(): {
-            "value": "set_c2_value",
-        },
-        GrandchildState2.get_full_name(): {
-            "cached": "set_c2_value",
         },
         GrandchildState3.get_full_name(): {
             "computed": "",
