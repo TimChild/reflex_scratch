@@ -40,17 +40,17 @@ line-length = 120
 docstring-code-format = true
 
 [tool.pytest.ini_options]
-#testpaths = ['tests']
-timeout = 300  # Global timeout for all tests (prevent indefinite hangs, but cancels all tests)
+testpaths = ['tests']
+timeout = 300 # Global timeout for all tests (prevent indefinite hangs, but cancels all tests)
 addopts = [
-    "--import-mode=importlib",  # Recommended by pytest (default is `prepend` for backwards compatibility)
-    "-r a",  # Show summary of (a)ll but passes
-#    "-v",  # Increase verbosity
-    "--capture=no",  # Show print/log statements
-    "--strict-markers",  # Make sure no undefined markers are used
-#    '--runslow', # Run slow tests
+    "--import-mode=importlib", # Recommended by pytest (default is `prepend` for backwards compatibility)
+    "-r a",                    # Show summary of (a)ll but passes
+    #    "-v",  # Increase verbosity
+    "--capture=no",     # Show print/log statements
+    "--strict-markers", # Make sure no undefined markers are used
+    #    '--runslow', # Run slow tests
 ]
 markers = [
-    "slow",  # Mark slow tests
+    "slow", # Mark slow tests
 ]
-asyncio_mode = "auto"  # Automatically detects async test functions and fixtures and treats them as marked
+asyncio_mode = "auto" # Automatically detects async test functions and fixtures and treats them as marked

@@ -1,15 +1,18 @@
+from __future__ import annotations
+import os
+from typing import TYPE_CHECKING
 from unittest import mock
 import uuid
 import pytest
 import reflex as rx
-from reflex.testing import AppHarness
 from reflex.state import StateManagerRedis, _substate_key, BaseState
-from selenium.webdriver.remote.webdriver import ( 
+from selenium.webdriver.remote.webdriver import (
     WebDriver,
 )
 from selenium.webdriver.common.by import By
-                                      
 
+if TYPE_CHECKING:
+    from reflex.testing import AppHarness
 
 
 def app_fn() -> None:
@@ -26,7 +29,8 @@ def app_fn() -> None:
             rx.heading('Hello World'),
             rx.text('SomeState.var_a: '),
             rx.text(SomeState.var_a, id='text-output'),
-            rx.button('Increment', id='button-increment', on_click=SomeState.increment_var_a),
+            rx.button('Increment', id='button-increment',
+                      on_click=SomeState.increment_var_a),
         )
     app = rx.App()
     app.add_page(index)
@@ -34,6 +38,10 @@ def app_fn() -> None:
 
 @pytest.fixture(scope='module')
 def app_harness(tmp_path_factory):
+    from reflex.testing import AppHarness
+    if not os.environ.get("PYTEST_CURRENT_TEST"):
+        os.environ["PYTEST_CURRENT_TEST"] = 'setup'
+
     with AppHarness.create(
         root=tmp_path_factory.mktemp('app_harness_root'),
         app_source=app_fn,

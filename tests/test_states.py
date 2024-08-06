@@ -36,7 +36,8 @@ class TestState(BaseState):
     obj: Object = Object()
     complex: dict[int, Object] = {1: Object(), 2: Object()}
     fig: go.Figure = go.Figure()
-    dt: datetime.datetime = datetime.datetime.fromisoformat("1989-11-09T18:53:00+01:00")
+    dt: datetime.datetime = datetime.datetime.fromisoformat(
+        "1989-11-09T18:53:00+01:00")
 
     @ComputedVar
     def sum(self) -> float:
@@ -134,7 +135,8 @@ class DateTimeState(BaseState):
     """A State with some datetime fields."""
 
     d: datetime.date = datetime.date.fromisoformat("1989-11-09")
-    dt: datetime.datetime = datetime.datetime.fromisoformat("1989-11-09T18:53:00+01:00")
+    dt: datetime.datetime = datetime.datetime.fromisoformat(
+        "1989-11-09T18:53:00+01:00")
     t: datetime.time = datetime.time.fromisoformat("18:53:00+01:00")
     td: datetime.timedelta = datetime.timedelta(days=11, minutes=11)
 
@@ -225,7 +227,8 @@ async def test_get_state(mock_app: rx.App, token: str):
         )
 
     # Because ChildState3 has a computed var, it is always dirty, and always populated.
-    assert test_state.substates[ChildState3.get_name()].substates[GrandchildState3.get_name()].computed == ""
+    assert test_state.substates[ChildState3.get_name(
+    )].substates[GrandchildState3.get_name()].computed == ""
 
     # Get the child_state2 directly.
     child_state2_direct = test_state.get_substate([ChildState2.get_name()])
@@ -256,7 +259,8 @@ async def test_get_state(mock_app: rx.App, token: str):
     assert child_state_direct is child_state_get_state
 
     # GrandchildState instance should be the same as the one retrieved from the child_state2.
-    assert grandchild_state is child_state_direct.get_substate([GrandchildState.get_name()])
+    assert grandchild_state is child_state_direct.get_substate(
+        [GrandchildState.get_name()])
     grandchild_state.value2 = "set_value"
 
     assert test_state.get_delta() == {
