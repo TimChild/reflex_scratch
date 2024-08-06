@@ -5,6 +5,10 @@ description = ""
 authors = ["Tim Child <timjchild@gmail.com>"]
 readme = "README.md"
 
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
 [tool.poetry.dependencies]
 python = "^3.11"
 #reflex = "^0.4.8"
@@ -29,15 +33,24 @@ pytest = "^8.2.1"
 pytest-asyncio = "^0.23.7"
 selenium = "^4.23.1"
 
-[tool.pytest.ini_options]
-asyncio_mode = "auto" # Automatically detects async test functions and fixtures and treats them as marked
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
-
 [tool.ruff]
 line-length = 120
 
 [tool.ruff.format]
 docstring-code-format = true
+
+[tool.pytest.ini_options]
+#testpaths = ['tests']
+timeout = 300  # Global timeout for all tests (prevent indefinite hangs, but cancels all tests)
+addopts = [
+    "--import-mode=importlib",  # Recommended by pytest (default is `prepend` for backwards compatibility)
+    "-r a",  # Show summary of (a)ll but passes
+#    "-v",  # Increase verbosity
+    "--capture=no",  # Show print/log statements
+    "--strict-markers",  # Make sure no undefined markers are used
+#    '--runslow', # Run slow tests
+]
+markers = [
+    "slow",  # Mark slow tests
+]
+asyncio_mode = "auto"  # Automatically detects async test functions and fixtures and treats them as marked

@@ -1,0 +1,26 @@
+version: '3'
+
+# dotenv: ['.env']
+
+tasks:
+  watch-all-tests: task watch-tests WPATH="reflex_test/" TPATH="tests/" OPTS="--disable-warnings --runslow"
+
+  watch-tests:
+    desc: Start a task that will re-run tests with OPTS under TPATH (default "") any time files change under WPATH (default "reflex_test/") given path
+    vars:
+      WPATH: '{{default "reflex_test/" .WPATH}}'
+      TPATH: '{{default "tests/" .TPATH}}'
+      OPTS: '{{default "" .OPTS}}'
+    cmds:
+      - ENV=test && find {{.WPATH}} {{.TPATH}} -name "*.py" | entr -c task test OPTS='{{.OPTS}}' TPATH='{{.TPATH}}'
+
+  test:
+    desc: Run pytest (with .env loaded by Taskfile) providing OPTS (e.g. "-s --disable-warnings") and TPATH (e.g. "tests/subdir")
+    env:
+      # Also set inline with command
+      ENV: test
+    vars:
+      TPATH: '{{default "" .TPATH}}'
+      OPTS: '{{default "" .OPTS}}'
+    cmds:
+      - ENV=test poetry run pytest {{.OPTS}} {{.TPATH}}
