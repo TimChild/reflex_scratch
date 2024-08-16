@@ -34,6 +34,8 @@ from .async_cached_var_issue import index as async_cached_var_issue
 from .inherit_multiple_mixin import index as inherit_multiple_mixin
 from .pydantic_v2_test import index as pydantic_v2_test
 from .updating_vars_with_unrelated_state_self import index as updating_vars_with_unrelated_state_self
+from .counter_example import index as counter_example
+
 
 # from .match_in_fstring_issue import index as match_in_fstring_issue
 
@@ -73,4 +75,5 @@ __all__ = [
     # "match_in_fstring_issue",
     "pydantic_v2_test",
     "updating_vars_with_unrelated_state_self",
+    "counter_example",
 ]

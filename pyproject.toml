@@ -4,6 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["Tim Child <timjchild@gmail.com>"]
 readme = "README.md"
+packages = [{ include = "reflex_test" }]
 
 [build-system]
 requires = ["poetry-core"]
@@ -41,7 +42,7 @@ docstring-code-format = true
 
 [tool.pytest.ini_options]
 testpaths = ['tests']
-timeout = 300 # Global timeout for all tests (prevent indefinite hangs, but cancels all tests)
+# timeout = 300 # Global timeout for all tests (prevent indefinite hangs, but cancels all tests)
 addopts = [
     "--import-mode=importlib", # Recommended by pytest (default is `prepend` for backwards compatibility)
     "-r a",                    # Show summary of (a)ll but passes

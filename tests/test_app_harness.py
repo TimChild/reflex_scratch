@@ -24,6 +24,7 @@ def app_fn() -> None:
         def increment_var_a(self) -> None:
             self.var_a += 1
 
+    @rx.page()
     def index() -> rx.Component:
         return rx.container(
             rx.heading('Hello World'),
@@ -33,14 +34,11 @@ def app_fn() -> None:
                       on_click=SomeState.increment_var_a),
         )
     app = rx.App()
-    app.add_page(index)
 
 
 @pytest.fixture(scope='module')
 def app_harness(tmp_path_factory):
     from reflex.testing import AppHarness
-    if not os.environ.get("PYTEST_CURRENT_TEST"):
-        os.environ["PYTEST_CURRENT_TEST"] = 'setup'
 
     with AppHarness.create(
         root=tmp_path_factory.mktemp('app_harness_root'),
