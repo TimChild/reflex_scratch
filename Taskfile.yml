@@ -24,3 +24,8 @@ tasks:
       OPTS: '{{default "" .OPTS}}'
     cmds:
       - ENV=test poetry run pytest {{.OPTS}} {{.TPATH}}
+
+  run:
+    desc: Run the app
+    cmds:
+      - poetry run reflex run
