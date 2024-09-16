@@ -5,7 +5,6 @@ import reflex as rx
 from reflex_test.templates import template
 
 
-
 class DifferentState(rx.State):
     color: str = "red"
     _clicks: int = 0

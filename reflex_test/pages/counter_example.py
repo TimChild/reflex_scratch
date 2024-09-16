@@ -23,11 +23,9 @@ class Counter(rx.ComponentState):
     def get_component(cls, **props):
         # Access the state vars and event handlers using `cls`.
         return rx.hstack(
-            rx.button("Decrement", on_click=cls.decrement,
-                      id="button-decrement"),
+            rx.button("Decrement", on_click=cls.decrement, id="button-decrement"),
             rx.text(cls.count, id="counter-value"),
-            rx.button("Increment", on_click=cls.increment,
-                      id="button-increment"),
+            rx.button("Increment", on_click=cls.increment, id="button-increment"),
             **props,
         )
 
@@ -49,10 +47,8 @@ class OtherState(rx.State):
 @template(route="/counter_example", title="Counter example")
 def index() -> rx.Component:
     counter = Counter.create()
-    other_component = rx.card(
-        rx.vstack(rx.text("I only increment"), rx.text(OtherState.value)))
-    counter.State.register_listener(
-        OtherState.increment_when_counter_increments)
+    other_component = rx.card(rx.vstack(rx.text("I only increment"), rx.text(OtherState.value)))
+    counter.State.register_listener(OtherState.increment_when_counter_increments)
 
     counter_2 = Counter.create()
     return rx.container(
@@ -62,13 +58,12 @@ def index() -> rx.Component:
                 counter,
             ),
             rx.hstack(
-                rx.text(
-                    "Some other component that updates when the counter increments"),
+                rx.text("Some other component that updates when the counter increments"),
                 other_component,
-            )
+            ),
         ),
         rx.hstack(
             rx.text("Another counter that is separate"),
             counter_2,
-        )
+        ),
     )

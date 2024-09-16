@@ -1,4 +1,3 @@
-
 from typing import Sequence
 from unittest import mock
 import uuid
@@ -23,8 +22,7 @@ def _substate_key(
         The substate key.
     """
     if isinstance(state_cls_or_name, BaseState) or (
-        isinstance(state_cls_or_name, type) and issubclass(
-            state_cls_or_name, BaseState)
+        isinstance(state_cls_or_name, type) and issubclass(state_cls_or_name, BaseState)
     ):
         state_cls_or_name = state_cls_or_name.get_full_name()
     elif isinstance(state_cls_or_name, (list, tuple)):
@@ -49,6 +47,7 @@ def app_mockifier(monkeypatch: pytest.MonkeyPatch, app_: rx.App) -> rx.App:
 @pytest.fixture()
 def mock_full_app(monkeypatch) -> rx.App:
     from reflex_test.reflex_test import app
+
     yield app_mockifier(monkeypatch, app)
 
 
@@ -80,11 +79,12 @@ class TestMockFullApp:
 
 async def test_ephemeral_app(monkeypatch):
     """Test with a fully self contained app"""
+
     class SomeState(BaseState):
         a: int = 2
 
     def page() -> rx.Component:
-        return rx.container(rx.text('some state'), rx.text(SomeState.a))
+        return rx.container(rx.text("some state"), rx.text(SomeState.a))
 
     app = rx.App(state=SomeState)
     app.add_page(page)
@@ -102,4 +102,3 @@ async def test_ephemeral_app(monkeypatch):
     with pytest.raises(RuntimeError):
         # Shouldn't be able to see states outside of this
         state = await base_state.get_state(ValsState)
-

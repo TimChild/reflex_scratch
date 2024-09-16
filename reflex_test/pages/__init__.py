@@ -7,7 +7,7 @@ from .main_app import main_app
 # from .audio_recorder_2 import index as audio_recorder_2
 # from .audio_recorder_polyfill import index as audio_recorder_polyfill
 # from .carousel import index as carousel
-# from .scroll_area_width_issue import index as scroll_area_width_issue
+from .scroll_area_width_issue import index as scroll_area_width_issue
 from .component_with_state import index as component_with_state
 from .async_background_testing import index as async_background_testing
 
@@ -35,6 +35,7 @@ from .inherit_multiple_mixin import index as inherit_multiple_mixin
 from .pydantic_v2_test import index as pydantic_v2_test
 from .updating_vars_with_unrelated_state_self import index as updating_vars_with_unrelated_state_self
 from .counter_example import index as counter_example
+from .markdown_with_copy import index as markdown_with_copy
 
 
 # from .match_in_fstring_issue import index as match_in_fstring_issue
@@ -47,7 +48,7 @@ __all__ = [
     # "audio_record",
     # "audio_recorder_polyfill",
     # "carousel",
-    # "scroll_area_width_issue",
+    "scroll_area_width_issue",
     "component_with_state",
     "async_background_testing",
     # "audio_recorder_2",
@@ -76,4 +77,5 @@ __all__ = [
     "pydantic_v2_test",
     "updating_vars_with_unrelated_state_self",
     "counter_example",
+    "markdown_with_copy",
 ]

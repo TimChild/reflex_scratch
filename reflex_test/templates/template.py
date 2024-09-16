@@ -135,6 +135,7 @@ def template(
                         **styles.template_page_style,
                     ),
                     width=styles.content_width_vw,
+                    size="4",
                 ),
             )
 

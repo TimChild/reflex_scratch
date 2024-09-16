@@ -27,21 +27,21 @@ def app_fn() -> None:
     @rx.page()
     def index() -> rx.Component:
         return rx.container(
-            rx.heading('Hello World'),
-            rx.text('SomeState.var_a: '),
-            rx.text(SomeState.var_a, id='text-output'),
-            rx.button('Increment', id='button-increment',
-                      on_click=SomeState.increment_var_a),
+            rx.heading("Hello World"),
+            rx.text("SomeState.var_a: "),
+            rx.text(SomeState.var_a, id="text-output"),
+            rx.button("Increment", id="button-increment", on_click=SomeState.increment_var_a),
         )
+
     app = rx.App()
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def app_harness(tmp_path_factory):
     from reflex.testing import AppHarness
 
     with AppHarness.create(
-        root=tmp_path_factory.mktemp('app_harness_root'),
+        root=tmp_path_factory.mktemp("app_harness_root"),
         app_source=app_fn,
     ) as harness:
         assert harness.app_instance is not None, "app not running"
@@ -51,7 +51,7 @@ def app_harness(tmp_path_factory):
 TIMEOUT = 5
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def driver(app_harness):
     driver = app_harness.frontend()
     try:
@@ -62,12 +62,11 @@ def driver(app_harness):
 
 def test_harness(app_harness: AppHarness, driver: WebDriver):
     """Tests by building the app and hosting locally -- slow but good for full integration"""
-    button = driver.find_element(By.ID, 'button-increment')
-    value_text = driver.find_element(By.ID, 'text-output')
-    assert value_text.text == '1'
+    button = driver.find_element(By.ID, "button-increment")
+    value_text = driver.find_element(By.ID, "text-output")
+    assert value_text.text == "1"
     button.click()
-    assert app_harness.poll_for_content(
-        value_text, timeout=TIMEOUT, exp_not_equal='1') == '2'
+    assert app_harness.poll_for_content(value_text, timeout=TIMEOUT, exp_not_equal="1") == "2"
 
 
 class SomeState(rx.State):

@@ -1,7 +1,7 @@
 import pytest
 import os
 
-os.environ['PYTEST_CURRENT_TEST'] = 'setup'
+os.environ["PYTEST_CURRENT_TEST"] = "setup"
 
 
 def pytest_addoption(parser):
