@@ -17,7 +17,7 @@ class BasicMixin(rx.State, mixin=True):
         logger.debug("var_a called")
         return self.a + 10
 
-    @rx.cached_var
+    @rx.var(cached=True)
     def cached_a(self) -> int:
         logger.debug("cached_a called")
         return self.a + 20

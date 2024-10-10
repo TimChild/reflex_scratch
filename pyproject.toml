@@ -14,7 +14,7 @@ build-backend = "poetry.core.masonry.api"
 python = "^3.11"
 #reflex = "^0.4.8"
 #reflex = { path = "../reflex"}
-reflex = "^0.5.7"
+reflex = "^0.6.0"
 google-auth = { extras = ["requests"], version = "^2.29.0" }
 python-dotenv = "^1.0.1"
 reflex-webcam = "^0.0.5"

@@ -32,7 +32,8 @@ from .mixin_cached_or_background_issue import index as mixin_cached_or_backgroun
 from .separation_of_display_from_processing import index as separation_of_display_from_processing
 from .async_cached_var_issue import index as async_cached_var_issue
 from .inherit_multiple_mixin import index as inherit_multiple_mixin
-from .pydantic_v2_test import index as pydantic_v2_test
+
+# from .pydantic_v2_test import index as pydantic_v2_test
 from .updating_vars_with_unrelated_state_self import index as updating_vars_with_unrelated_state_self
 from .counter_example import index as counter_example
 from .markdown_with_copy import index as markdown_with_copy
@@ -74,7 +75,7 @@ __all__ = [
     "inherit_multiple_mixin",
     #
     # "match_in_fstring_issue",
-    "pydantic_v2_test",
+    # "pydantic_v2_test",
     "updating_vars_with_unrelated_state_self",
     "counter_example",
     "markdown_with_copy",

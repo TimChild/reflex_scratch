@@ -64,7 +64,8 @@ class StorageBase(rx.State, mixin=True):
         """
         unique_key = self._generate_key(attr, key)
         logger.debug(f"Storing {value} as {unique_key}")
-        redis.set(unique_key, dill.dumps(value, byref=True), ex=self.timeout(attr))
+        redis.set(unique_key, dill.dumps(
+            value, byref=True), ex=self.timeout(attr))
 
     def load(
         self, attr: str, key: str | int, expected_type: type[model_type] = None, default: model_type | None = None
@@ -82,7 +83,8 @@ class StorageBase(rx.State, mixin=True):
             logger.debug(f"Loaded {loaded} as {unique_key}")
             if expected_type:
                 if not isinstance(loaded, expected_type):
-                    raise ValueError(f"Expected {expected_type}, got {type(loaded)}")
+                    raise ValueError(
+                        f"Expected {expected_type}, got {type(loaded)}")
             return loaded
         logger.debug(f'No data for key "{unique_key}"')
         return default
@@ -151,7 +153,7 @@ class DisplayA(ProcessA, mixin=True):
     """Anything directly related to what will be displayed to user and user interaction (i.e. including setting the
     on_click for event handlers etc. (but can refer to methods in ProcessBase)"""
 
-    @rx.cached_var
+    @rx.var(cached=True)
     def a(self) -> str:
         logger.debug("DispA: Getting A")
         loaded = self.load("key_a", self.key_a, A)
@@ -159,7 +161,7 @@ class DisplayA(ProcessA, mixin=True):
             return loaded.model_dump_json(indent=2)
         return "None"
 
-    @rx.cached_var
+    @rx.var(cached=True)
     def b(self) -> str:
         logger.debug("DispA: Getting B")
         loaded = self.load("key_b", self.key_b, B)
@@ -183,7 +185,8 @@ class DisplayA(ProcessA, mixin=True):
                 rx.button("Change A", on_click=cls.handle_change_a),
                 rx.button("Change B", on_click=cls.handle_change_b),
             ),
-            rx.button("Logs Separator", color_scheme="purple", on_click=cls.log_separator),
+            rx.button("Logs Separator", color_scheme="purple",
+                      on_click=cls.log_separator),
         )
 
     def log_separator(self):
@@ -191,7 +194,7 @@ class DisplayA(ProcessA, mixin=True):
 
 
 class DisplayB(ProcessB, ProcessA, mixin=True):
-    @rx.cached_var
+    @rx.var(cached=True)
     def a(self) -> str:
         logger.debug("DispB: Getting A")
         loaded = self.load("key_a", self.key_a, A)
@@ -199,7 +202,7 @@ class DisplayB(ProcessB, ProcessA, mixin=True):
             return loaded.model_dump_json(indent=2).upper()
         return "Different"
 
-    @rx.cached_var
+    @rx.var(cached=True)
     def b(self) -> str:
         logger.debug("DispB: Getting B")
         loaded = self.load("key_b", self.key_b, B)
@@ -235,7 +238,8 @@ class DisplayB(ProcessB, ProcessA, mixin=True):
                 rx.button("Update B", on_click=cls.update_b),
                 wrap="wrap",
             ),
-            rx.button("Logs Separator", color_scheme="purple", on_click=cls.log_separator),
+            rx.button("Logs Separator", color_scheme="purple",
+                      on_click=cls.log_separator),
         )
 
     def log_separator(self):

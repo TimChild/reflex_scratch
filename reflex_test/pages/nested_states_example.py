@@ -52,9 +52,11 @@ class B(rx.ComponentState):
     val_b: int = 2
     complicated_value: int = 0
 
-    val_a_reference: rx.Var[int] = None  # <<< Ideally this would reference the val_a from the associated A component
+    # <<< Ideally this would reference the val_a from the associated A component
+    val_a_reference: int = None
     state_a: ClassVar[type[rx.State]] = (
-        None  # <<< Or at least this could hold a reference to the state class that the value comes from.
+        # <<< Or at least this could hold a reference to the state class that the value comes from.
+        None
     )
 
     @classmethod
@@ -126,7 +128,8 @@ class B(rx.ComponentState):
         # Thought about trying to get the whole state
         val_a = cast(A, await self.get_state(self.state_a)).val_a
         # But get an AttributeError: NoneType object has no attribute `get_full_name`
-        self.complicated_value = self.val_b**val_a  # placeholder for something that would actually require server-side
+        # placeholder for something that would actually require server-side
+        self.complicated_value = self.val_b**val_a
 
 
 class HighLevelState(rx.State):
