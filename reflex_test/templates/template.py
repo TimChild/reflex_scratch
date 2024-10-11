@@ -83,7 +83,7 @@ def nav_bar() -> rx.Component:
 class ThemeState(rx.State):
     """The state for the theme of the app."""
 
-    accent_color: str = "crimson"
+    accent_color: str = "indigo"
 
 
 def template(

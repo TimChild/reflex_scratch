@@ -21,7 +21,8 @@ class A(rx.ComponentState):
     ):
         # It's pretty easy to use handlers from Higher level components in the layout of this component
         additional_button = (
-            rx.button("Trigger the HighLevelSubmission", on_click=handle_submission)
+            rx.button("Trigger the HighLevelSubmission",
+                      on_click=handle_submission)
             if handle_submission
             else rx.fragment()
         )
@@ -82,9 +83,11 @@ class B(rx.ComponentState):
             rx.button("Increment", on_click=cls.increment),
             rx.button("Decrement", on_click=cls.decrement),
             rx.divider(),
-            rx.text("But I'm not sure how I could use that in a calculated var or event handler", weight="bold"),
+            rx.text(
+                "But I'm not sure how I could use that in a calculated var or event handler", weight="bold"),
             # rx.text(f'Result of a cached_var that uses val_a and cls.val_b: {cls.cached_example}'),
-            rx.button("Do something complicated with val_a and val_b", on_click=cls.do_complicated_stuff),
+            rx.button("Do something complicated with val_a and val_b",
+                      on_click=cls.do_complicated_stuff),
             rx.text(f"complicated_value: {cls.complicated_value}"),
         )
 
@@ -93,8 +96,10 @@ class B(rx.ComponentState):
         # Copied from rx.ComponentState.create
         cls._per_component_state_instance_count += 1
         state_cls_name = f"{cls.__name__}_n{cls._per_component_state_instance_count}"
-        component_state = type(state_cls_name, (cls, rx.State), {}, mixin=False)
-        component = component_state.get_component(index, val_a, state_a, *children, **props)
+        component_state = type(
+            state_cls_name, (cls, rx.State), {}, mixin=False)
+        component = component_state.get_component(
+            index, val_a, state_a, *children, **props)
         component.State = component_state
         ####
 
@@ -140,12 +145,13 @@ class HighLevelState(rx.State):
         # (where I have those states organized in the States class)
         # In this HighLevelState I can just target the specific states I need which works well
         state_a = cast(A, await self.get_state(StatesAndComponents.a.State))
-        state_b = cast(B, await self.get_state(StatesAndComponents.b.State))
+        # state_b = cast(B, await self.get_state(StatesAndComponents.b.State))
         state_a_2 = cast(A, await self.get_state(StatesAndComponents.a_2.State))
-        state_b_2 = cast(B, await self.get_state(StatesAndComponents.b_2.State))
+        # state_b_2 = cast(B, await self.get_state(StatesAndComponents.b_2.State))
 
         # Placeholder for something that would actually require server-side
-        self.main_result = state_a.val_a + state_b.val_b + state_a_2.val_a + state_b_2.val_b
+        self.main_result = state_a.val_a + state_b.val_b + \
+            state_a_2.val_a + state_b_2.val_b
 
 
 class StatesAndComponents:
@@ -159,9 +165,10 @@ class StatesAndComponents:
     high_level = HighLevelState
 
     a = A.create(1, fixed_val=10)
-    b = B.create(1, a.State.val_a, a.State)
-    a_2 = A.create(2, handle_submission=high_level.handle_submission, fixed_val=20)
-    b_2 = B.create(2, a_2.State.val_a, a_2.State)
+    # b = B.create(1, a.State.val_a, a.State)
+    a_2 = A.create(
+        2, handle_submission=high_level.handle_submission, fixed_val=20)
+    # b_2 = B.create(2, a_2.State.val_a, a_2.State)
     # ^^^ This works pretty well as long as the dependency is one directional
 
     a_3 = A.create(3, default_val=100)
@@ -179,19 +186,22 @@ def index() -> rx.Component:
             ),
             rx.grid(
                 StatesAndComponents.a,
-                StatesAndComponents.b,
+                # StatesAndComponents.b,
                 StatesAndComponents.a_2,
-                StatesAndComponents.b_2,
+                # StatesAndComponents.b_2,
                 columns="2",
                 rows="2",
             ),
             rx.divider(),
-            rx.text("Then I have some higher level states that use values from those components", weight="bold"),
-            rx.button("Main submission", on_click=StatesAndComponents.high_level.handle_submission),
+            rx.text(
+                "Then I have some higher level states that use values from those components", weight="bold"),
+            rx.button("Main submission",
+                      on_click=StatesAndComponents.high_level.handle_submission),
             rx.card(
                 rx.text("Main output"),
                 rx.divider(),
-                rx.text("The main result from the HighLevelState (adding all 4 values together is):", weight="bold"),
+                rx.text(
+                    "The main result from the HighLevelState (adding all 4 values together is):", weight="bold"),
                 rx.text(StatesAndComponents.high_level.main_result),
             ),
             rx.divider(),

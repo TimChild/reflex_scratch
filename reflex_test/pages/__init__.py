@@ -37,6 +37,7 @@ from .inherit_multiple_mixin import index as inherit_multiple_mixin
 from .updating_vars_with_unrelated_state_self import index as updating_vars_with_unrelated_state_self
 from .counter_example import index as counter_example
 from .markdown_with_copy import index as markdown_with_copy
+from .multi_checkbox import index as multi_checkbox
 
 
 # from .match_in_fstring_issue import index as match_in_fstring_issue
@@ -79,4 +80,5 @@ __all__ = [
     "updating_vars_with_unrelated_state_self",
     "counter_example",
     "markdown_with_copy",
+    "multi_checkbox",
 ]
