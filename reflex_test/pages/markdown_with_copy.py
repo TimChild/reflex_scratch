@@ -20,9 +20,9 @@ def index() -> rx.Component:
 
         did it? --- Well, not for now, because setting can_copy=True results in an error.
         """,
-        component_map={
-            "codeblock": lambda text, **props: rx.fragment(rx.code_block(
-                text, **props, can_copy=False))
-
-        }
+        # component_map={
+        #     "codeblock": lambda text, **props: rx.fragment(
+        #         rx.code_block(text, **props, can_copy=True),
+        #     ),
+        # },
     )

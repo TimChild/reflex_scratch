@@ -1,5 +1,18 @@
+from typing import Any
+
 import reflex as rx
 from reflex_test.templates import template
+
+
+def set_component_state_default(class_: type[rx.State], attr_name: str, value: Any) -> None:  # noqa: ANN401
+    """Sets a new default value for the given attribute of the state class.
+
+    Temporary solution for changing default behaviour of ComponentState from:
+    https://github.com/reflex-dev/reflex/issues/3771
+
+    Note: This is for use only when interacting with the `cls` object rather than the `self` used in event handlers.
+    """
+    class_.get_fields()[attr_name].default = value
 
 
 class Item(rx.Base):
@@ -13,8 +26,8 @@ ITEMS = [
 ]
 
 
-class MultiCheckbox(rx.State):
-    available_options: list[Item] = ITEMS
+class MultiCheckbox(rx.ComponentState):
+    available_options: list[Item] = []
     selected_items: list[Item] = []
 
     menu_open: bool = False
@@ -22,6 +35,7 @@ class MultiCheckbox(rx.State):
     def select_item(self, item: Item):
         if item in self.selected_items:
             self.selected_items.remove(item)
+
         else:
             self.selected_items.append(item)
 
@@ -29,10 +43,13 @@ class MultiCheckbox(rx.State):
         self.menu_open = is_open
 
     @classmethod
-    def create(cls, button_text: str) -> rx.Component:
+    def get_component(cls, button_text: str, items: list[Item]) -> rx.Component:
+        set_component_state_default(cls, "available_options", items)
+
         return rx.flex(
             rx.menu.root(
-                rx.menu.trigger(rx.box(rx.button(button_text, on_click=lambda: cls.set_menu_open(True)))),
+                rx.menu.trigger(
+                    rx.box(rx.button(button_text, on_click=lambda: cls.set_menu_open(True)))),
                 rx.menu.content(
                     rx.text("Available Tools"),
                     rx.menu.separator(),
@@ -41,7 +58,8 @@ class MultiCheckbox(rx.State):
                         lambda item: rx.menu.item(
                             rx.checkbox(
                                 item.item_name,
-                                checked=cls.selected_items.contains(item.key, "key"),
+                                checked=cls.selected_items.contains(
+                                    item.key, "key"),
                                 on_change=lambda _: cls.select_item(item),
                             ),
                         ),
@@ -90,6 +108,6 @@ def index() -> rx.Component:
             rx.text("multi checkbox test"),
             rx.divider(),
             rx.button("test"),
-            MultiCheckbox.create(button_text="Select tools"),
+            MultiCheckbox.create(button_text="Select tools", items=ITEMS),
         ),
     )
