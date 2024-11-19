@@ -6,15 +6,8 @@ Helpful to see how javascript can be added to the page.
 
 import reflex as rx
 from reflex_test.templates import template
-
-
-def index() -> rx.Component:
-    return rx.vstack(
-        rx.heading("Expandable Textarea"),
-        rx.text_area(min_height="2.5em", width="80vw"),
-        align="center",
-        height="100vh",
-    )
+from lorem import sentence
+import random
 
 
 # https://stackoverflow.com/a/25621277
@@ -55,6 +48,14 @@ text_area_auto_expand_script = rx.script("""
 class TextState(rx.State):
     text: str = ""
 
+    @rx.event()
+    def set_text(self, val: str):
+        self.text = val
+
+    @rx.event()
+    def update_text_value(self):
+        self.text = "\n\n".join([sentence() for _ in range(random.randint(1, 5))])
+
 
 @template(
     route="/text_area_expand",
@@ -66,9 +67,10 @@ def index() -> rx.Component:
         text_area_auto_expand_script,
         rx.heading("Testing expandable text area"),
         rx.text_area(
-            # value=TextState.text,
-            # on_change=TextState.set_text,
+            value=TextState.text,
+            on_change=TextState.set_text,
             placeholder="Enter text here",
             max_height="200px",
         ),
+        rx.button("update text", on_click=TextState.update_text_value),
     )
