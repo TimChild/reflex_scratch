@@ -16,7 +16,7 @@ class SomeBase(rx.Base):
 class ValsState(rx.State):
     base: SomeBase = SomeBase()
 
-    @rx.var(cached=True)
+    @rx.var(cache=True)
     def a_plus_b(self) -> int:
         return self.base.a + self.base.b
 

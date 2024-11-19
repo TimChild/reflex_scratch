@@ -26,7 +26,7 @@ class AuthState(rx.State):
     def on_success(self, id_token: dict):
         self.id_token_json = json.dumps(id_token)
 
-    @rx.var(cached=True)
+    @rx.var(cache=True)
     def tokeninfo(self) -> dict[str, str]:
         try:
             return verify_oauth2_token(
@@ -50,7 +50,7 @@ class AuthState(rx.State):
         except Exception:
             return False
 
-    @rx.var(cached=True)
+    @rx.var(cache=True)
     def protected_content(self) -> str:
         if self.token_is_valid:
             return f"This content can only be viewed by a logged in User. Nice to see you {self.tokeninfo['name']}"

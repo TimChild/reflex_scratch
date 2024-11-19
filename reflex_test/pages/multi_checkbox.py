@@ -48,8 +48,7 @@ class MultiCheckbox(rx.ComponentState):
 
         return rx.flex(
             rx.menu.root(
-                rx.menu.trigger(
-                    rx.box(rx.button(button_text, on_click=lambda: cls.set_menu_open(True)))),
+                rx.menu.trigger(rx.box(rx.button(button_text, on_click=lambda: cls.set_menu_open(True)))),
                 rx.menu.content(
                     rx.text("Available Tools"),
                     rx.menu.separator(),
@@ -58,13 +57,12 @@ class MultiCheckbox(rx.ComponentState):
                         lambda item: rx.menu.item(
                             rx.checkbox(
                                 item.item_name,
-                                checked=cls.selected_items.contains(
-                                    item.key, "key"),
+                                checked=cls.selected_items.contains(item.key, "key"),
                                 on_change=lambda _: cls.select_item(item),
                             ),
                         ),
                     ),
-                    on_pointer_down_outside=lambda _: cls.set_menu_open(False),
+                    on_pointer_down_outside=lambda: cls.set_menu_open(False),
                 ),
                 open=cls.menu_open,
             )
