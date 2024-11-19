@@ -13,8 +13,8 @@ class MatchState(rx.State):
 class SliderState(rx.State):
     value: int = 0
 
-    def set_value(self, value: list[int]):
-        self.value = value[0]
+    def set_value(self, value: list[int | float]) -> None:
+        self.value = int(value[0])
 
 
 # MODEL_MAX_TOKENS = {
@@ -67,8 +67,8 @@ class ExampleComponentState(rx.ComponentState):
             max=calc_max_value(match_value),
         )
 
-    def set_value(self, value: list[int]):
-        self.value = value[0]
+    def set_value(self, value: list[int | float]) -> None:
+        self.value = int(value[0])
 
 
 @template(route="/match_testing", title="Match Testing")
