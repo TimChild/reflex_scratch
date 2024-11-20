@@ -1686,13 +1686,13 @@ wrapt = {version = ">=1.14.0,<2.0", markers = "python_version >= \"3.11\""}
 
 [[package]]
 name = "reflex-audio-capture"
-version = "0.0.2"
+version = "0.0.4"
 description = "Experimental audio-recorder-polyfill component"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "reflex_audio_capture-0.0.2-py3-none-any.whl", hash = "sha256:7aafa6cabe527522db7d18ec38dc0ca7d4592337f59c74be6a9e1a7d20f1b647"},
-    {file = "reflex_audio_capture-0.0.2.tar.gz", hash = "sha256:9d8e1c2f64f0a3f00746526bc00d8fe5af8eb92f320d9a0f1f633bbd615773ce"},
+    {file = "reflex_audio_capture-0.0.4-py3-none-any.whl", hash = "sha256:1b2640740e1a04841e1418b9cb4f1d8b413bb78b44cecc6bddf70fb0cbc053a3"},
+    {file = "reflex_audio_capture-0.0.4.tar.gz", hash = "sha256:8d9b0d4d56138d8cb17bf8a18331c2c7e03073ca5683c8569e63911b24156279"},
 ]
 
 [package.dependencies]
@@ -2554,4 +2554,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "84245ea3a66f472b2247c6a89bf82c5623e37af50d0dcb35c7a564a32ad0dac8"
+content-hash = "f6f7eb1e2099d6d7ad2c2c520d3aa1add9d2f3183d3347c4a53c54eb4be68310"

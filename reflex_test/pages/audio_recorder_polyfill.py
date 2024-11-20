@@ -105,10 +105,10 @@ def index() -> rx.Component:
                         value=[State.timeslice],
                         on_change=State.set_timeslice,
                     ),
-                    # rx.cond(
-                    #     capture.media_devices,
-                    #     input_device_select(),
-                    # ),
+                    rx.cond(
+                        capture.media_devices,
+                        input_device_select(),
+                    ),
                 ),
             ),
             capture,
