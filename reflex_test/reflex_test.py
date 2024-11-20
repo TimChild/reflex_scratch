@@ -18,6 +18,9 @@ text_area_auto_expand_script = rx.script("""
         }
         """)
 
+
 # Create the app.
 # app = rx.App(style=styles.base_style, head_components=[text_area_auto_expand_script])
 app = rx.App(style=styles.base_style, head_components=[])
+
+# app.add_page(audio_recorder_polyfill, route="/audio_recorder", title="Audio recorder example")
