@@ -5,7 +5,8 @@ from .main_app import main_app
 # from .webcam import index as webcam
 # from .audio_record import index as audio_record
 # from .audio_recorder_2 import index as audio_recorder_2
-# from .audio_recorder_polyfill import index as audio_recorder_polyfill
+from .audio_recorder_polyfill import index as audio_recorder_polyfill
+
 # from .carousel import index as carousel
 from .scroll_area_width_issue import index as scroll_area_width_issue
 from .component_with_state import index as component_with_state
@@ -49,7 +50,7 @@ __all__ = [
     # "chatroom",
     # "webcam",
     # "audio_record",
-    # "audio_recorder_polyfill",
+    "audio_recorder_polyfill",
     # "carousel",
     "scroll_area_width_issue",
     "component_with_state",
