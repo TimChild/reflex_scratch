@@ -70,7 +70,7 @@ def nav_bar() -> rx.Component:
     """
     return rx.hstack(
         rx.link(
-            "Athena",
+            "Scratch",
             href="/",
             font_size="1.5em",
             color=styles.accent_text_color,

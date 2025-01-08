@@ -50,7 +50,7 @@ class UserState(rx.State):
         return f"Token info: {s}"
 
 
-@template(route="/", title="Athena", description="Main app")
+@template(route="/", title="Scratch", description="Main app")
 @require_google_login
 def main_app() -> rx.Component:
     """"""

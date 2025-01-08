@@ -2,7 +2,6 @@ import reflex as rx
 from reflex.constants.colors import ColorType
 import lorem
 
-from reflex_test.templates import template
 
 COLORS = [
     "pink",

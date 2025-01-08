@@ -5,9 +5,7 @@ Helpful to see how javascript can be added to the page.
 """
 
 import reflex as rx
-from reflex.components.radix.themes.components.text_area import TextArea
 from reflex_test.templates import template
-from reflex.utils import imports
 from lorem import sentence
 import random
 
