@@ -152,7 +152,7 @@ async def test_get_another_state_from_regular_callback(mock_app, token):
     class StateB(MyBaseState):
         var_b: int = 2
 
-        @rx.background
+        @rx.event(background=True)
         async def get_child_a_value_background(self):
             async with self:
                 child_a = await self.get_state(ChildStateA)

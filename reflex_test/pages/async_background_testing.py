@@ -33,7 +33,7 @@ class ScratchState(rx.State):
     def change_color_by_method(self):
         self.sync_color_change_method()
 
-    @rx.background
+    @rx.event(background=True)
     async def async_change_color(self):
         print("Changing color async")
         async with self:
@@ -62,7 +62,7 @@ class ScratchState(rx.State):
         await asyncio.sleep(0.5)
         yield DifferentState.change_color
 
-    @rx.background
+    @rx.event(background=True)
     async def async_change_color_by_method(self):
         async for v in self.async_color_change_method_with_self():
             yield v
@@ -75,7 +75,7 @@ class ScratchState(rx.State):
         different_state = await self.get_state(DifferentState)
         different_state.color = "white"
 
-    @rx.background
+    @rx.event(background=True)
     async def increment_number(self):
         async with self:
             self.number = 10
@@ -83,7 +83,7 @@ class ScratchState(rx.State):
         async with self:
             self.number = 20
 
-    @rx.background
+    @rx.event(background=True)
     async def start_several_tasks_via_yields(self):
         async with self:
             self.number = 0

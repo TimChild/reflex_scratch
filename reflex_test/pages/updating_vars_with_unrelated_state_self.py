@@ -23,7 +23,7 @@ class StateWithVars(rx.State):
 class UnrelatedState(rx.State):
     unrelated_var: int = 5
 
-    @rx.background
+    @rx.event(background=True)
     async def do_stuff_background(self):
         async with self:
             s = await self.get_state(StateWithVars)

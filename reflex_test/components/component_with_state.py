@@ -10,7 +10,7 @@ class ComponentWithState(rx.ComponentState):
     def update(self):
         self.text = random.choice(["Hello, Universe!", "Hello, you!", "Hello, Galaxy!", "Hello, Multiverse!"])
 
-    @rx.background
+    @rx.event(background=True)
     async def update_background(self):
         while True:
             async with self:

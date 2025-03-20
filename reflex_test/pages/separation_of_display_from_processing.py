@@ -380,7 +380,7 @@ class FullB(rx.ComponentState):
     async def change_b(self):
         return await ABController(self_state=self, backend_state_class=self.backend_state).change_b()
 
-    @rx.background
+    @rx.event(background=True)
     async def start_counting(self):
         async for event in ABController(
             self_state=self, frontend_state_class=self.frontend_state, background=True

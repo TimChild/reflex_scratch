@@ -33,7 +33,7 @@ class AnotherMixin(rx.State, mixin=True):  # , abc.ABC):
             await asyncio.sleep(0.1)
 
     async def increment_mixin_background(self):
-        """This one cannot be implemented as a @rx.background directly in the mixin. But it can implement the logic
+        """This one cannot be implemented as a @rx.event(background=True) directly in the mixin. But it can implement the logic
         i.e. using async with self.
         Then a very simple _event method can be added to the class that it is mixing into.
         """
@@ -42,7 +42,7 @@ class AnotherMixin(rx.State, mixin=True):  # , abc.ABC):
                 self.mixin_value += 1
             await asyncio.sleep(0.1)
 
-    @rx.background
+    @rx.event(background=True)
     @abc.abstractmethod
     async def increment_mixin_background_event(self):
         """Can't be mixed in directly because it doesn't get detected as a background task"""
@@ -67,7 +67,7 @@ class OptionalSelfMixin:
 class OtherState(rx.State):
     external_call_value: int = 0
 
-    @rx.background
+    @rx.event(background=True)
     async def run_with_one_value(self):
         # async with self:
         # page_state = cast(PageState, await self.get_state(PageState))
@@ -83,7 +83,7 @@ class OtherState(rx.State):
         yield PageState.initialize_state(val, second_val)
         print(f"Tried to init val with: {val}, second_val with: {second_val}")
 
-    @rx.background
+    @rx.event(background=True)
     async def await_method_of_another_state_event(self):
         async with self:
             page_state = cast(PageState, await self.get_state(PageState))
@@ -155,7 +155,7 @@ class PageState(OptionalSelfMixin, AnotherMixin, rx.State):
 
     external_call_value: int = 0
 
-    @rx.background
+    @rx.event(background=True)
     async def increment_mixin_background_event(self):
         await self.increment_mixin_background()
 
@@ -177,13 +177,13 @@ class PageState(OptionalSelfMixin, AnotherMixin, rx.State):
             yield
             await asyncio.sleep(0.03)
 
-    @rx.background
+    @rx.event(background=True)
     async def do_something_event(self):
         # await self.do_something_method_background()
         async for event in self.do_something_method(with_self=True):
             yield event
 
-    @rx.background
+    @rx.event(background=True)
     async def call_external_method_background_event(self):
         """
         This behaves like a normal background handler except that when yielding events from the OtherState it
@@ -235,18 +235,14 @@ def index() -> rx.Component:
                 rx.vstack(
                     rx.text("The State version:"),
                     rx.text(f"PageState.value: {PageState.value}"),
-                    rx.text(f"PageState.second_value: {
-                            PageState.second_value}"),
+                    rx.text(f"PageState.second_value: {PageState.second_value}"),
                 ),
-                rx.button("Yield event from OtherState with one value",
-                          on_click=OtherState.run_with_one_value),
+                rx.button("Yield event from OtherState with one value", on_click=OtherState.run_with_one_value),
                 # rx.button('Set via other with second value', on_click=OtherState.run_with_second_value),
-                rx.button("PageState.do_something_event",
-                          on_click=PageState.do_something_event),
+                rx.button("PageState.do_something_event", on_click=PageState.do_something_event),
                 rx.form(
                     rx.hstack(
-                        rx.input(name="second_value",
-                                 placeholder="Second value", width="200px"),
+                        rx.input(name="second_value", placeholder="Second value", width="200px"),
                         rx.button("OtherState.run_with_second_value"),
                         wrap="wrap",
                     ),
@@ -258,27 +254,20 @@ def index() -> rx.Component:
                 ),
                 rx.divider(),
                 rx.text(f"Mixin value: {PageState.mixin_value}"),
-                rx.button("Increment mixin sync",
-                          on_click=PageState.increment_mixin_sync_event),
-                rx.button("Increment mixin async",
-                          on_click=PageState.increment_mixin_async_event),
-                rx.button("Increment mixin background",
-                          on_click=PageState.increment_mixin_background_event),
+                rx.button("Increment mixin sync", on_click=PageState.increment_mixin_sync_event),
+                rx.button("Increment mixin async", on_click=PageState.increment_mixin_async_event),
+                rx.button("Increment mixin background", on_click=PageState.increment_mixin_background_event),
                 rx.divider(),
                 rx.heading("External Call Testing", size="5"),
                 rx.button(
                     "OtherState.call_external_method_background_event",
                     on_click=PageState.call_external_method_background_event,
                 ),
-                rx.button("PageState.call_external_method_event",
-                          on_click=PageState.call_external_method_event),
-                rx.text(f"PageState.external_call_value: {
-                        PageState.external_call_value}"),
-                rx.text(f"OtherState.external_call_value: {
-                        OtherState.external_call_value}"),
+                rx.button("PageState.call_external_method_event", on_click=PageState.call_external_method_event),
+                rx.text(f"PageState.external_call_value: {PageState.external_call_value}"),
+                rx.text(f"OtherState.external_call_value: {OtherState.external_call_value}"),
                 rx.text(f"AnotherOtherState.value: {AnotherOtherState.value}"),
-                rx.button("OtherState.regular_event",
-                          on_click=OtherState.regular_event),
+                rx.button("OtherState.regular_event", on_click=OtherState.regular_event),
             ),
         ),
     )

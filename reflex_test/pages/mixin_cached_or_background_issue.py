@@ -28,7 +28,7 @@ class BasicMixin(rx.State, mixin=True):
     async def increment_b(self):
         self.b += 1
 
-    @rx.background
+    @rx.event(background=True)
     async def increment_c(self):
         async with self:
             self.c += 1

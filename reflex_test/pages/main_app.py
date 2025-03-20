@@ -69,7 +69,6 @@ def main_app() -> rx.Component:
                 width="100%",
                 on_submit=lambda e: TextState.handle_submit(),
             ),
-            # rx.chakra.text_area(width='100%', placeholder='How can I...'),
             rx.text_area(
                 read_only=True,
                 value=TextState.submitted_value,
@@ -84,7 +83,7 @@ def main_app() -> rx.Component:
             rx.divider(),
             rx.text("Debugging info:"),
             # rx.text_area(value=UserState.info, read_only=True, width='100%'),
-            rx.chakra.text_area(value=UserState.info, width="100%", rows=10, is_read_only=True),
+            rx.text_area(value=UserState.info, width="100%", is_read_only=True),
             # rx.text(f'Current user: {UserState.user}'),
             rx.button("Login", on_click=UserState.init_auth),
         ),

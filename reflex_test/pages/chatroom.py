@@ -54,34 +54,34 @@ class ChatroomState(rx.State):
     description="Chatroom",
 )
 def chatroom() -> rx.Component:
-    return rx.chakra.vstack(
-        rx.chakra.center(rx.chakra.heading("Reflex Chat!", font_size="2em")),
-        rx.chakra.hstack(
-            rx.chakra.vstack(
-                rx.chakra.input(
+    return rx.vstack(
+        rx.center(rx.heading("Reflex Chat!", font_size="2em")),
+        rx.hstack(
+            rx.vstack(
+                rx.input(
                     placeholder="Username",
                     default_value=ChatroomState.current_username,
                     on_blur=ChatroomState.username_change,
                 ),
-                rx.chakra.text("Other Users", font_weight="bold"),
-                rx.foreach(ChatroomState.other_usernames, rx.chakra.text),
+                rx.text("Other Users", font_weight="bold"),
+                rx.foreach(ChatroomState.other_usernames, rx.text),
                 width="20vw",
                 align_items="left",
             ),
-            rx.chakra.vstack(
+            rx.vstack(
                 rx.foreach(
                     ChatroomState.messages,
-                    lambda m: rx.chakra.text("<", m.username, "> ", m.message),
+                    lambda m: rx.text("<", m.username, "> ", m.message),
                 ),
-                rx.chakra.form(
-                    rx.chakra.hstack(
-                        rx.chakra.input(
+                rx.form(
+                    rx.hstack(
+                        rx.input(
                             placeholder="Message",
                             value=ChatroomState.input_message,
                             on_change=ChatroomState.set_input_message,
                             flex_grow=1,
                         ),
-                        rx.chakra.button("Send", on_click=ChatroomState.send_message),
+                        rx.button("Send", on_click=ChatroomState.send_message),
                     ),
                     on_submit=lambda d: ChatroomState.send_message(),
                 ),

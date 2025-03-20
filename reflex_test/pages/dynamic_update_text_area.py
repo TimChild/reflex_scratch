@@ -45,7 +45,7 @@ class TextAreaState(rx.State):
 
 
 class OtherTextAreaState(rx.State):
-    @rx.background
+    @rx.event(background=True)
     async def update_text_area(self):
         async with self:
             dynamic_state = await self.get_state(TextAreaState)
