@@ -1,6 +1,8 @@
 # from .settings import settings
 from .main_app import main_app
 
+from .drawer_select_issue import index as drawer_select_issue
+
 # from .chatroom import chatroom
 # from .webcam import index as webcam
 # from .audio_record import index as audio_record
@@ -86,4 +88,5 @@ __all__ = [
     "markdown_with_copy",
     "multi_checkbox",
     "textarea_expand",
+    "drawer_select_issue",
 ]
