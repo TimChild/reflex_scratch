@@ -78,11 +78,13 @@ def index() -> rx.Component:
     return rx.container(
         rx.heading("Payments Page", size="5"),
         "payments_page",
-        rx.hstack(
+        rx.flex(
             option_1(),
             option_2(),
             option_3(),
             align="stretch",
             justify="between",
+            direction=rx.breakpoints(initial="column", sm="row"),
+            spacing="3",
         ),
     )
