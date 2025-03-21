@@ -1,5 +1,6 @@
 # from .settings import settings
 from .main_app import main_app
+from .payments_page import index as payments_page
 
 from .drawer_select_issue import index as drawer_select_issue
 
@@ -89,4 +90,5 @@ __all__ = [
     "multi_checkbox",
     "textarea_expand",
     "drawer_select_issue",
+    "payments_page",
 ]
