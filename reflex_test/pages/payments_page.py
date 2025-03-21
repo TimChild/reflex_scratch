@@ -6,6 +6,7 @@ def option_1() -> rx.Component:
     return payment_card(
         "Top Up",
         "$5",
+        "500 credits",
         [
             "Use any integrated LLM (GPT, Gemini, Claude, Grok, etc.)",
             "Web search",
@@ -20,7 +21,8 @@ def option_1() -> rx.Component:
 def option_2() -> rx.Component:
     return payment_card(
         "Monthly",
-        "$10",
+        "$10/pm",
+        "1200 credits",
         [
             "Everything in Top Up plus...",
             "Priority support",
@@ -34,6 +36,7 @@ def option_2() -> rx.Component:
 def option_3() -> rx.Component:
     return payment_card(
         "Business",
+        "--",
         "Contact us",
         [
             "Everything in Monthly plus...",
@@ -45,11 +48,12 @@ def option_3() -> rx.Component:
     )
 
 
-def payment_card(heading: str, price: str, features: list[str]) -> rx.Component:
+def payment_card(heading: str, price: str, description: str, features: list[str]) -> rx.Component:
     return rx.card(
         rx.vstack(
             rx.heading(heading, size="7"),
-            rx.heading(price, size="5"),
+            rx.heading(price, size="8", color=rx.color("accent", 10)),
+            rx.heading(description, size="4"),
             rx.divider(width="80%", margin_x="auto"),
             rx.heading("Key features:", size="6"),
             rx.vstack(
