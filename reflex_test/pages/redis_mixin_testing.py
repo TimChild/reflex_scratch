@@ -151,7 +151,11 @@ class DisplayA(ProcessA, mixin=True):
     """Anything directly related to what will be displayed to user and user interaction (i.e. including setting the
     on_click for event handlers etc. (but can refer to methods in ProcessBase)"""
 
-    @rx.var(cache=True)
+    @rx.var(
+        cache=True,
+        deps=["key_a"],
+        auto_deps=False,
+    )
     def a(self) -> str:
         logger.debug("DispA: Getting A")
         loaded = self.load("key_a", self.key_a, A)
@@ -159,7 +163,11 @@ class DisplayA(ProcessA, mixin=True):
             return loaded.model_dump_json(indent=2)
         return "None"
 
-    @rx.var(cache=True)
+    @rx.var(
+        cache=True,
+        deps=["key_b"],
+        auto_deps=False,
+    )
     def b(self) -> str:
         logger.debug("DispA: Getting B")
         loaded = self.load("key_b", self.key_b, B)
