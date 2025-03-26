@@ -6,6 +6,9 @@ from reflex_test.templates import template
 # @rx.page(route="/drawer_select_issue", title="Select not working in drawer")
 def index() -> rx.Component:
     return rx.container(
+        rx.text(
+            "2025-03-26 -- Was having issue with rx.select inside a rx.drawer... The select dropdown would immediately close when opened. This ended up being fixed by setting the select position to 'popper' instead of the default 'item-aligned'."
+        ),
         rx.color_mode.button(),
         rx.popover.root(
             rx.popover.trigger(rx.button("Open Popover")),
