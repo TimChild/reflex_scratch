@@ -1,6 +1,7 @@
 # from .settings import settings
 from .main_app import main_app
 from .payments_page import index as payments_page
+from .cookie_test import index as cookie_test
 
 from .drawer_select_issue import index as drawer_select_issue
 
@@ -51,6 +52,7 @@ from .duplicate_tabs_issue import index as duplicate_tabs_issue
 __all__ = [
     # "settings",
     "main_app",
+    "cookie_test",
     # "chatroom",
     # "webcam",
     # "audio_record",
