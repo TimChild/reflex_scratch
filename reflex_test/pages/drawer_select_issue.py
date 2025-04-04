@@ -9,6 +9,14 @@ def index() -> rx.Component:
         rx.text(
             "2025-03-26 -- Was having issue with rx.select inside a rx.drawer... The select dropdown would immediately close when opened. This ended up being fixed by setting the select position to 'popper' instead of the default 'item-aligned'."
         ),
+        rx.box(
+            rx.hstack(
+                rx.select(["a", "b", "c"], position="popper"),
+                rx.select(["a", "b", "c"], position="item-aligned"),
+                spacing="9",
+            ),
+            margin_y="10em",
+        ),
         rx.color_mode.button(),
         rx.popover.root(
             rx.popover.trigger(rx.button("Open Popover")),
